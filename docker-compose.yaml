@@ -1,0 +1,29 @@
+networks:
+  backend_app_v3:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.0.0/24
+
+services:
+  frontend-member-ship-odeon-v3:
+    hostname: frontend
+    environment:
+      - TZ=America/Sao_Paulo
+      - APP_ENV=PRODUCTION
+    platform: linux/amd64
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    restart: on-failure
+    volumes:
+      - ./:/var/www/app
+    ports:
+      - "31000:80"
+    deploy:
+      resources:
+        limits:
+          cpus: '4'
+          memory: 8192M
+    init: true
+
