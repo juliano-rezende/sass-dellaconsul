@@ -162,7 +162,7 @@ endif; ?>
 
 
 <!-- jQuery -->
-<script src="<?= urlBase(THEME_DASHBOARD . "/assets/jquery/jquery-3.7.1.min.js"); ?>"></script>
+<script src="<?= urlBase(THEME_DASHBOARD . "/assets/jquery/jquery-4.0.0.min.js"); ?>"></script>
 <!-- Bootstrap JS -->
 <script src="<?= urlBase(THEME_DASHBOARD . "/assets/bootstrap-5.3.7-dist/js/bootstrap.bundle.min.js"); ?>"></script>
 <script>

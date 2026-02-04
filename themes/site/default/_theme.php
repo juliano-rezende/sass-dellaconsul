@@ -30,7 +30,7 @@ else:?>
     <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container">
             <a class="navbar-brand" href="#">
-                <img src="<?=urlBase(THEME_SITE ."/assets/images/logo-3d.png");?>" alt="Della Consul">
+                <img src="<?=urlBase(THEME_SITE ."/assets/images/logo-cz.jpeg");?>" alt="Della Consul">
             </a>
 
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -145,7 +145,7 @@ else:?>
 <?php endif; ?>
 
 <!-- jQuery -->
-<script src="<?=urlBase(THEME_SITE ."/assets/jquery/jquery-3.7.1.min.js");?>"></script>
+<script src="<?=urlBase(THEME_SITE ."/assets/jquery/jquery-4.0.0.min.js");?>"></script>
 <!-- Bootstrap JS -->
 <script src="<?=urlBase(THEME_SITE ."/assets/bootstrap-5.3.7-dist/js/bootstrap.bundle.min.js");?>"></script>
 <!-- Custom JS -->
