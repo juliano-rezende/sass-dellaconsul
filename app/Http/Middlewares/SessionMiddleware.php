@@ -1,6 +1,6 @@
 <?php
 
-namespace source\App\Http\Middlewares;
+namespace App\Http\Middlewares;
 
 use CoffeeCode\Router\Router;
 

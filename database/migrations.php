@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/../../vendor/autoload.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
 use Doctrine\DBAL\DriverManager;
 use Doctrine\Migrations\Configuration\Migration\PhpFile;
@@ -8,11 +8,11 @@ use Doctrine\Migrations\Configuration\Connection\ExistingConnection;
 use Doctrine\Migrations\DependencyFactory;
 
 // Carrega variáveis de ambiente
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../..');
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
 $dotenv->safeLoad();
 
 // Carrega configurações
-require_once __DIR__ . '/../Config.php';
+require_once __DIR__ . '/../config/app.php';
 
 // Cria conexão DBAL
 $connectionParams = [
@@ -37,7 +37,7 @@ $config = new \Doctrine\Migrations\Configuration\Migration\ConfigurationArray([
         'execution_time_column_name' => 'execution_time',
     ],
     'migrations_paths' => [
-        'Source\Database\Migrations' => __DIR__ . '/migrations',
+        'Database\Migrations' => __DIR__ . '/migrations',
     ],
     'all_or_nothing' => true,
     'transactional' => true,

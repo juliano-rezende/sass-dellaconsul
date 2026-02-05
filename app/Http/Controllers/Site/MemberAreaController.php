@@ -1,10 +1,10 @@
 <?php
 
-namespace source\App\Http\Controllers\Site;
+namespace App\Http\Controllers\Site;
 
 use League\Plates\Engine;
 
-class contactController
+class memberAreaController
 {
     
     private Engine $view;
@@ -18,8 +18,7 @@ class contactController
     
     public function index($router): void
     {
-        echo $this->view->render("pages/contact", ["title" => $router]);
+        echo $this->view->render("pages/member-area", ["title" => $router]);
     }
 
-    
 }

@@ -1,10 +1,10 @@
 <?php
 
-namespace source\App\Http\Controllers\Dashboard;
+namespace App\Http\Controllers\Dashboard;
 
 use League\Plates\Engine;
 
-class FormController
+class UsersController
 {
 
     private Engine $view;
@@ -18,7 +18,7 @@ class FormController
 
     public function index($router): void
     {
-        echo $this->view->render("pages/forms", ["title" => $router]);
+        echo $this->view->render("pages/users", ["title" => $router]);
     }
 
 

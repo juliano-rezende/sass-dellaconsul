@@ -8,7 +8,7 @@ use CoffeeCode\Router\Router;
 $router = new Router(URL_BASE);
 
 
-$router->group(null)->namespace("Source\App\Http\Controllers\Site");
+$router->group(null)->namespace("App\Http\Controllers\Site");
 $router->get("/", "HomeController:index", "home.index");
 $router->get("/contatos", "ContactController:index", "contact.index");
 $router->get("/clientes", "MemberAreaController:index", "member.area.index");
@@ -16,7 +16,7 @@ $router->get("/area-segura", "IntranetController:index", "intranet.index");
 $router->get("/trabalhe-conosco", "CareersController:index", "careers.index");
 
 
-$router->group('dashboard')->namespace("Source\App\Http\Controllers\Dashboard");
+$router->group('dashboard')->namespace("App\Http\Controllers\Dashboard");
 $router->get("/", "DashboardController:index", "dashboard.index");
 $router->get("/formularios", "FormController:index", "form.index");
 $router->get("/sliders", "SliderController:index", "slider.index");
@@ -29,7 +29,7 @@ $router->get("/configuracoes", "ConfigsController:index", "user.index");
 /*
  * ERROS
  */
-$router->group("error")->namespace("Source\Controllers\Helpers");
+$router->group("error")->namespace("App\Helpers");
 $router->get("/{errorCode}", "Errors:run");
 
 $router->dispatch();

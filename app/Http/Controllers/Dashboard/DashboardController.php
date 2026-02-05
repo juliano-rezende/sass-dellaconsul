@@ -1,10 +1,10 @@
 <?php
 
-namespace source\App\Http\Controllers\Dashboard;
+namespace App\Http\Controllers\Dashboard;
 
 use League\Plates\Engine;
 
-class CurriculumController
+class DashboardController
 {
 
     private Engine $view;
@@ -18,7 +18,7 @@ class CurriculumController
 
     public function index($router): void
     {
-        echo $this->view->render("pages/curriculum", ["title" => $router]);
+        echo $this->view->render("pages/dashboard", ["title" => $router]);
     }
 
 

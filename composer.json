@@ -16,12 +16,13 @@
   },
   "autoload": {
     "psr-4": {
-      "Source\\": "source/"
+      "App\\": "app/",
+      "Database\\": "database/"
     },
     "files": [
       "bootstrap.php",
-      "source/Config.php",
-      "source/App/Support/Debug.php"
+      "config/app.php",
+      "app/Support/Debug.php"
     ]
   },
   "require": {

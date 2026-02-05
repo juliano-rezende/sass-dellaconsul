@@ -1,12 +1,11 @@
 <?php
 
-namespace source\App\Http\Controllers\Dashboard;
+namespace App\Http\Controllers\Dashboard;
 
 use League\Plates\Engine;
 
-class DashboardController
+class ArquivosCondominiumController
 {
-
     private Engine $view;
 
 
@@ -18,8 +17,7 @@ class DashboardController
 
     public function index($router): void
     {
-        echo $this->view->render("pages/dashboard", ["title" => $router]);
+        echo $this->view->render("pages/arquivos-condominium", ["title" => $router]);
     }
-
 
 }

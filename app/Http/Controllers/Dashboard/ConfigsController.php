@@ -1,23 +1,25 @@
 <?php
 
-namespace source\App\Http\Controllers\Site;
+namespace App\Http\Controllers\Dashboard;
 
 use League\Plates\Engine;
 
-class CareersController
+class ConfigsController
 {
+
     private Engine $view;
 
 
     public function __construct($router)
     {
-        $this->view = new Engine(dirname(__DIR__, 5) . "/".THEME_SITE, "php");
+        $this->view = new Engine(dirname(__DIR__, 5) . "/".THEME_DASHBOARD, "php");
         $this->view->addData(["router" => $router]);
     }
 
     public function index($router): void
     {
-        echo $this->view->render("pages/careers", ["title" => $router]);
+        echo $this->view->render("pages/configs", ["title" => $router]);
     }
+
 
 }

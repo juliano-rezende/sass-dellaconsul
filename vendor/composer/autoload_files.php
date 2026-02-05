@@ -14,6 +14,6 @@ return array(
     'b6b991a57620e2fb6b2f66f03fe9ddc2' => $vendorDir . '/symfony/string/Resources/functions.php',
     'a4a119a56e50fbb293281d9a48007e0e' => $vendorDir . '/symfony/polyfill-php80/bootstrap.php',
     '0159acf232a7492dee248f51c1aae602' => $baseDir . '/bootstrap.php',
-    '4b7976bbad17b760e5f592c9f61900cc' => $baseDir . '/source/Config.php',
-    '8edba8d0163b3a16750c1cbaa01b32b2' => $baseDir . '/source/App/Support/Debug.php',
+    '5eeca2784e2382771763d6bc5ca03657' => $baseDir . '/config/app.php',
+    '8141f30f745ed42ebc3ff696096797d8' => $baseDir . '/app/Support/Debug.php',
 );

@@ -15,8 +15,8 @@ class ComposerStaticInit73adbdb06ff4be7cc04fbf2e9c709f8f
         'b6b991a57620e2fb6b2f66f03fe9ddc2' => __DIR__ . '/..' . '/symfony/string/Resources/functions.php',
         'a4a119a56e50fbb293281d9a48007e0e' => __DIR__ . '/..' . '/symfony/polyfill-php80/bootstrap.php',
         '0159acf232a7492dee248f51c1aae602' => __DIR__ . '/../..' . '/bootstrap.php',
-        '4b7976bbad17b760e5f592c9f61900cc' => __DIR__ . '/../..' . '/source/Config.php',
-        '8edba8d0163b3a16750c1cbaa01b32b2' => __DIR__ . '/../..' . '/source/App/Support/Debug.php',
+        '5eeca2784e2382771763d6bc5ca03657' => __DIR__ . '/../..' . '/config/app.php',
+        '8141f30f745ed42ebc3ff696096797d8' => __DIR__ . '/../..' . '/app/Support/Debug.php',
     );
 
     public static $prefixLengthsPsr4 = array (
@@ -32,7 +32,6 @@ class ComposerStaticInit73adbdb06ff4be7cc04fbf2e9c709f8f
             'Symfony\\Component\\String\\' => 25,
             'Symfony\\Component\\Stopwatch\\' => 28,
             'Symfony\\Component\\Console\\' => 26,
-            'Source\\' => 7,
         ),
         'P' =>
         array (
@@ -63,10 +62,15 @@ class ComposerStaticInit73adbdb06ff4be7cc04fbf2e9c709f8f
             'Doctrine\\Deprecations\\' => 22,
             'Doctrine\\DBAL\\' => 14,
             'Doctrine\\Common\\' => 16,
+            'Database\\' => 9,
         ),
         'C' =>
         array (
             'CoffeeCode\\Router\\' => 18,
+        ),
+        'A' =>
+        array (
+            'App\\' => 4,
         ),
     );
 
@@ -110,10 +114,6 @@ class ComposerStaticInit73adbdb06ff4be7cc04fbf2e9c709f8f
         'Symfony\\Component\\Console\\' =>
         array (
             0 => __DIR__ . '/..' . '/symfony/console',
-        ),
-        'Source\\' =>
-        array (
-            0 => __DIR__ . '/../..' . '/source',
         ),
         'Psr\\Log\\' =>
         array (
@@ -175,9 +175,17 @@ class ComposerStaticInit73adbdb06ff4be7cc04fbf2e9c709f8f
         array (
             0 => __DIR__ . '/..' . '/doctrine/event-manager/src',
         ),
+        'Database\\' =>
+        array (
+            0 => __DIR__ . '/../..' . '/database',
+        ),
         'CoffeeCode\\Router\\' =>
         array (
             0 => __DIR__ . '/..' . '/coffeecode/router/src',
+        ),
+        'App\\' =>
+        array (
+            0 => __DIR__ . '/../..' . '/app',
         ),
     );
 
