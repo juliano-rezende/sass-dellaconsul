@@ -12,7 +12,7 @@ class homeController
     
     public function __construct($router)
     {
-        $this->view = new Engine(dirname(__DIR__, 5) . "/".THEME_SITE, "php");
+        $this->view = new Engine(dirname(__DIR__, 4) . "/".THEME_SITE, "php");
         $this->view->addData(["router" => $router]);
     }
     
