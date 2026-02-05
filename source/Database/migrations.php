@@ -9,7 +9,7 @@ use Doctrine\Migrations\DependencyFactory;
 
 // Carrega variáveis de ambiente
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../..');
-$dotenv->load();
+$dotenv->safeLoad();
 
 // Carrega configurações
 require_once __DIR__ . '/../Config.php';
