@@ -1,5 +1,5 @@
 # Usa a imagem base PHP
-ARG PHP_VERSION=8.3-fpm-bullseye
+ARG PHP_VERSION=8.4-fpm-bookworm
 FROM php:${PHP_VERSION}
 
 ## Diretório da aplicação
