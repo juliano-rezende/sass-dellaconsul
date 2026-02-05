@@ -36,6 +36,9 @@
     "predis/predis": "^1.1",
     "league/plates": "^3.6",
     "ext-mbstring": "*",
-    "ext-gd": "*"
+    "ext-gd": "*",
+    "ext-pdo": "*",
+    "doctrine/migrations": "^3.7",
+    "doctrine/dbal": "^3.8"
   }
 }

@@ -5,6 +5,10 @@ networks:
       config:
         - subnet: 192.168.0.0/24
 
+volumes:
+  mariadb_data:
+    driver: local
+
 services:
   frontend-member-ship-odeon-v3:
     hostname: frontend
@@ -20,6 +24,10 @@ services:
       - ./:/var/www/app
     ports:
       - "31000:80"
+    networks:
+      - backend_app_v3
+    depends_on:
+      - mariadb
     deploy:
       resources:
         limits:
@@ -27,3 +35,26 @@ services:
           memory: 8192M
     init: true
 
+  mariadb:
+    image: mariadb:10.11
+    hostname: mariadb
+    container_name: dellaconsul_mariadb
+    environment:
+      - TZ=America/Sao_Paulo
+      - MYSQL_ROOT_PASSWORD=root_password_change_me
+      - MYSQL_DATABASE=dellaconsul_db
+      - MYSQL_USER=dellaconsul_user
+      - MYSQL_PASSWORD=dellaconsul_pass_change_me
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    ports:
+      - "33060:3306"
+    networks:
+      - backend_app_v3
+    restart: unless-stopped
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2048M
