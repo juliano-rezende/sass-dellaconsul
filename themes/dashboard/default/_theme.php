@@ -42,11 +42,15 @@ else:?>
 
         <div class="sidebar-user">
             <div class="user-avatar">
-                <i class="fas fa-user-circle"></i>
+                <?php if (!empty($_SESSION['user_avatar'])): ?>
+                    <img src="<?= $_SESSION['user_avatar']; ?>" alt="Avatar" style="width: 40px; height: 40px; border-radius: 50%;">
+                <?php else: ?>
+                    <i class="fas fa-user-circle"></i>
+                <?php endif; ?>
             </div>
             <div class="user-info">
-                <h6 class="user-name">Darci</h6>
-                <span class="user-role">Administrador</span>
+                <h6 class="user-name"><?= $_SESSION['user_name'] ?? 'Usuário'; ?></h6>
+                <span class="user-role"><?= \App\Helpers\ACL::getRoleLabel($_SESSION['user_role'] ?? 'viewer'); ?></span>
             </div>
         </div>
 
@@ -106,15 +110,15 @@ else:?>
                 <div class="dropdown">
                     <button class="btn btn-link dropdown-toggle" type="button" data-bs-toggle="dropdown">
                         <i class="fas fa-user-circle"></i>
-                        João Silva
+                        <?= $_SESSION['user_name'] ?? 'Usuário'; ?>
                     </button>
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Perfil</a></li>
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Configurações</a></li>
+                        <li><a class="dropdown-item" href="<?= urlBase('dashboard/configuracoes'); ?>"><i class="fas fa-cog me-2"></i>Configurações</a></li>
                         <li>
                             <hr class="dropdown-divider">
                         </li>
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-sign-out-alt me-2"></i>Sair</a></li>
+                        <li><a class="dropdown-item" href="<?= urlBase('auth/logout'); ?>"><i class="fas fa-sign-out-alt me-2"></i>Sair</a></li>
                     </ul>
                 </div>
             </div>
