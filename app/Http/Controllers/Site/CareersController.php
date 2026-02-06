@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Site;
 
+use App\Models\Curriculum;
+use App\Models\CareerArea;
 use League\Plates\Engine;
 
 class CareersController
@@ -17,7 +19,126 @@ class CareersController
 
     public function index($router): void
     {
-        echo $this->view->render("pages/careers", ["title" => $router]);
+        // Busca áreas de carreira para o formulário
+        try {
+            $careerAreas = CareerArea::orderBy('name', 'ASC')->get();
+            $careerAreasArray = array_map(fn($area) => $area->toArray(), $careerAreas);
+        } catch (\Exception $e) {
+            $careerAreasArray = [];
+        }
+
+        echo $this->view->render("pages/careers", [
+            "title" => $router,
+            "careerAreas" => $careerAreasArray
+        ]);
+    }
+
+    /**
+     * Processa submissão de currículo
+     */
+    public function submit(): void
+    {
+        header('Content-Type: application/json');
+
+        try {
+            $name = filter_input(INPUT_POST, 'name', FILTER_SANITIZE_SPECIAL_CHARS);
+            $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
+            $phone = filter_input(INPUT_POST, 'phone', FILTER_SANITIZE_SPECIAL_CHARS);
+            $careerAreaId = filter_input(INPUT_POST, 'career_area_id', FILTER_VALIDATE_INT);
+            $position = filter_input(INPUT_POST, 'position', FILTER_SANITIZE_SPECIAL_CHARS);
+            $experienceYears = filter_input(INPUT_POST, 'experience_years', FILTER_VALIDATE_INT) ?? 0;
+            $message = filter_input(INPUT_POST, 'message', FILTER_SANITIZE_SPECIAL_CHARS);
+
+            // Validações básicas
+            if (empty($name) || empty($email) || empty($phone) || !$careerAreaId) {
+                echo json_encode(['success' => false, 'message' => 'Preencha todos os campos obrigatórios']);
+                return;
+            }
+
+            // Upload de arquivo
+            $filePath = $this->handleFileUpload();
+            if (!$filePath) {
+                echo json_encode(['success' => false, 'message' => 'Erro ao fazer upload do arquivo. Verifique se é PDF e tem no máximo 5MB']);
+                return;
+            }
+
+            // Cria currículo usando o Model
+            $curriculum = Curriculum::create([
+                'name' => $name,
+                'email' => $email,
+                'phone' => $phone,
+                'career_area_id' => $careerAreaId,
+                'position' => $position ?? '',
+                'experience_years' => $experienceYears,
+                'file_path' => $filePath,
+                'message' => $message ?? '',
+                'status' => 'novo'
+            ]);
+
+            if ($curriculum) {
+                echo json_encode([
+                    'success' => true,
+                    'message' => 'Currículo enviado com sucesso! Entraremos em contato em breve.'
+                ]);
+            } else {
+                $errors = (new Curriculum())->errors();
+                $errorMessage = !empty($errors) ? implode(', ', array_map(fn($e) => implode(', ', $e), $errors)) : 'Erro ao enviar currículo';
+                echo json_encode(['success' => false, 'message' => $errorMessage]);
+            }
+
+        } catch (\Exception $e) {
+            echo json_encode(['success' => false, 'message' => 'Erro ao processar currículo: ' . $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Processa upload de arquivo PDF
+     */
+    private function handleFileUpload(): ?string
+    {
+        if (!isset($_FILES['curriculum_file']) || $_FILES['curriculum_file']['error'] !== UPLOAD_ERR_OK) {
+            return null;
+        }
+
+        $file = $_FILES['curriculum_file'];
+        
+        // Valida tipo de arquivo (apenas PDF)
+        $allowedTypes = ['application/pdf'];
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mimeType = finfo_file($finfo, $file['tmp_name']);
+        finfo_close($finfo);
+
+        if (!in_array($mimeType, $allowedTypes)) {
+            return null;
+        }
+
+        // Valida extensão
+        $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+        if ($extension !== 'pdf') {
+            return null;
+        }
+
+        // Valida tamanho (max 5MB)
+        if ($file['size'] > 5 * 1024 * 1024) {
+            return null;
+        }
+
+        // Cria diretório se não existir
+        $uploadDir = __DIR__ . '/../../../public/arquivos/curriculuns/';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
+        }
+
+        // Gera nome único
+        $filename = uniqid('curriculum_', true) . '.pdf';
+        $filepath = $uploadDir . $filename;
+
+        // Move arquivo
+        if (move_uploaded_file($file['tmp_name'], $filepath)) {
+            return 'arquivos/curriculuns/' . $filename;
+        }
+
+        return null;
     }
 
 }

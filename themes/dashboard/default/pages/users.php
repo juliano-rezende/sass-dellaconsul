@@ -69,18 +69,18 @@
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label for="userName" class="form-label">Nome Completo</label>
-                        <input type="text" class="form-control" id="userName" placeholder="Digite o nome completo" required>
+                        <input type="text" class="form-control" id="userName" name="name" placeholder="Digite o nome completo" required>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label for="userEmail" class="form-label">E-mail</label>
-                        <input type="email" class="form-control" id="userEmail" placeholder="Digite o e-mail" required>
+                        <input type="email" class="form-control" id="userEmail" name="email" placeholder="Digite o e-mail" required>
                     </div>
                 </div>
 
                 <div class="row">
                     <div class="col-md-4 mb-3">
                         <label for="userRole" class="form-label">Perfil</label>
-                        <select class="form-select" id="userRole" required>
+                        <select class="form-select" id="userRole" name="role" required>
                             <option value="">Selecione o perfil</option>
                             <option value="admin">Administrador</option>
                             <option value="manager">Gerente</option>
@@ -90,7 +90,7 @@
                     </div>
                     <div class="col-md-4 mb-3">
                         <label for="userDepartment" class="form-label">Departamento</label>
-                        <select class="form-select" id="userDepartment" required>
+                        <select class="form-select" id="userDepartment" name="department" required>
                             <option value="">Selecione o departamento</option>
                             <option value="administrativo">Administrativo</option>
                             <option value="financeiro">Financeiro</option>
@@ -101,7 +101,7 @@
                     </div>
                     <div class="col-md-4 mb-3">
                         <label for="userStatus" class="form-label">Status</label>
-                        <select class="form-select" id="userStatus" required>
+                        <select class="form-select" id="userStatus" name="status" required>
                             <option value="active">Ativo</option>
                             <option value="inactive">Inativo</option>
                             <option value="pending">Pendente</option>
@@ -113,7 +113,7 @@
                     <div class="col-md-6 mb-3">
                         <label for="userPassword" class="form-label">Senha</label>
                         <div class="input-group">
-                            <input type="password" class="form-control" id="userPassword" placeholder="Digite a senha" required>
+                            <input type="password" class="form-control" id="userPassword" name="password" placeholder="Digite a senha" required>
                             <button class="btn btn-outline-secondary" type="button" id="togglePassword">
                                 <i class="fas fa-eye"></i>
                             </button>
@@ -122,7 +122,7 @@
                     <div class="col-md-6 mb-3">
                         <label for="userConfirmPassword" class="form-label">Confirmar Senha</label>
                         <div class="input-group">
-                            <input type="password" class="form-control" id="userConfirmPassword" placeholder="Confirme a senha" required>
+                            <input type="password" class="form-control" id="userConfirmPassword" name="password_confirm" placeholder="Confirme a senha" required>
                             <button class="btn btn-outline-secondary" type="button" id="toggleConfirmPassword">
                                 <i class="fas fa-eye"></i>
                             </button>

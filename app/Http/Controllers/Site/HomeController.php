@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Site;
 
+use App\Models\Slider;
 use League\Plates\Engine;
 
 class homeController
@@ -18,7 +19,19 @@ class homeController
     
     public function index($router): void
     {
-        echo $this->view->render("pages/home", ["title" => $router]);
+        // Busca sliders ativos do banco
+        try {
+            $sliders = Slider::getActiveOrdered();
+            $slidersArray = array_map(fn($slider) => $slider->toArray(), $sliders);
+        } catch (\Exception $e) {
+            // Se houver erro, usa array vazio
+            $slidersArray = [];
+        }
+
+        echo $this->view->render("pages/home", [
+            "title" => $router,
+            "sliders" => $slidersArray
+        ]);
     }
 
     

@@ -6,96 +6,61 @@
 <?php $this->start("container"); ?>
 
 <!-- Hero Slideshow -->
+<?php if (!empty($sliders)): ?>
 <section id="home" class="hero-slideshow">
     <div id="heroCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel">
+        <?php if (count($sliders) > 1): ?>
         <div class="carousel-indicators">
-            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active"></button>
-            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1"></button>
-            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2"></button>
+            <?php foreach ($sliders as $index => $slider): ?>
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="<?= $index; ?>" <?= $index === 0 ? 'class="active"' : ''; ?>></button>
+            <?php endforeach; ?>
         </div>
+        <?php endif; ?>
 
         <div class="carousel-inner">
-            <div class="carousel-item active">
-                <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80')">
+            <?php foreach ($sliders as $index => $slider): ?>
+            <div class="carousel-item <?= $index === 0 ? 'active' : ''; ?>">
+                <div class="hero-slide" style="background-image: url('<?= urlBase($slider['image']); ?>')">
                     <div class="hero-content">
                         <div class="container">
                             <div class="row align-items-center min-vh-100">
                                 <div class="col-lg-6">
+                                    <?php if (!empty($slider['subtitle'])): ?>
+                                    <p class="hero-subtitle-small text-white mb-2"><?= htmlspecialchars($slider['subtitle']); ?></p>
+                                    <?php endif; ?>
                                     <h1 class="hero-title">
-                                        Gestão Profissional de Condomínios
+                                        <?= htmlspecialchars($slider['title']); ?>
                                     </h1>
+                                    <?php if (!empty($slider['description'])): ?>
                                     <p class="hero-subtitle">
-                                        Oferecemos soluções completas para a administração condominial,
-                                        garantindo tranquilidade e eficiência para síndicos e moradores.
+                                        <?= htmlspecialchars($slider['description']); ?>
                                     </p>
+                                    <?php endif; ?>
+                                    <?php if (!empty($slider['button_text']) && !empty($slider['button_link'])): ?>
                                     <div class="hero-buttons">
-                                        <a href="#servicos" class="btn btn-primary">Nossos Serviços</a>
-                                        <a href="contato.html" class="btn btn-outline">Fale Conosco</a>
+                                        <a href="<?= htmlspecialchars($slider['button_link']); ?>" class="btn btn-primary"><?= htmlspecialchars($slider['button_text']); ?></a>
                                     </div>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <div class="carousel-item">
-                <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80')">
-                    <div class="hero-content">
-                        <div class="container">
-                            <div class="row align-items-center min-vh-100">
-                                <div class="col-lg-6">
-                                    <h1 class="hero-title">
-                                        Tecnologia e Inovação
-                                    </h1>
-                                    <p class="hero-subtitle">
-                                        Sistemas modernos de gestão, aplicativos e comunicação digital
-                                        para facilitar a vida dos condôminos.
-                                    </p>
-                                    <div class="hero-buttons">
-                                        <a href="#servicos" class="btn btn-primary">Conheça Nossas Soluções</a>
-                                        <a href="contato.html" class="btn btn-outline">Solicitar Demo</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="carousel-item">
-                <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80')">
-                    <div class="hero-content">
-                        <div class="container">
-                            <div class="row align-items-center min-vh-100">
-                                <div class="col-lg-6">
-                                    <h1 class="hero-title">
-                                        Equipe Especializada
-                                    </h1>
-                                    <p class="hero-subtitle">
-                                        Profissionais certificados com mais de 15 anos de experiência
-                                        em gestão condominial.
-                                    </p>
-                                    <div class="hero-buttons">
-                                        <a href="#sobre" class="btn btn-primary">Conheça Nossa Equipe</a>
-                                        <a href="contato.html" class="btn btn-outline">Entre em Contato</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <?php endforeach; ?>
         </div>
 
+        <?php if (count($sliders) > 1): ?>
         <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
             <span class="carousel-control-prev-icon"></span>
         </button>
         <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
             <span class="carousel-control-next-icon"></span>
         </button>
+        <?php endif; ?>
     </div>
 </section>
+<?php endif; ?>
 
 <!-- Serviços -->
 <section id="servicos" class="services-section">

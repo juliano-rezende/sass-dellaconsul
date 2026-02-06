@@ -18,6 +18,7 @@ $router->get("/clientes", "MemberAreaController:index", "member.area.index");
 $router->get("/login", "IntranetController:index", "login.index");
 $router->get("/area-segura", "IntranetController:index", "login.index"); // Alias para compatibilidade
 $router->get("/trabalhe-conosco", "CareersController:index", "careers.index");
+$router->post("/trabalhe-conosco", "CareersController:submit", "careers.submit");
 
 // Rotas de autenticação
 $router->group(null)->namespace("App\Http\Controllers");
@@ -28,7 +29,14 @@ $router->get("/auth/logout", "AuthController:logout", "auth.logout");
 $router->group('dashboard', AuthMiddleware::class)->namespace("App\Http\Controllers\Dashboard");
 $router->get("/", "DashboardController:index", "dashboard.index");
 $router->get("/sliders", "SliderController:index", "slider.index");
+$router->post("/sliders/create", "SliderController:create", "slider.create");
+$router->post("/sliders/update", "SliderController:update", "slider.update");
+$router->post("/sliders/delete", "SliderController:delete", "slider.delete");
+$router->post("/sliders/reorder", "SliderController:reorder", "slider.reorder");
+$router->post("/sliders/toggle-status", "SliderController:toggleStatus", "slider.toggleStatus");
 $router->get("/curriculos", "CurriculumController:index", "curriculum.index");
+$router->post("/curriculos/update", "CurriculumController:update", "curriculum.update");
+$router->post("/curriculos/delete", "CurriculumController:delete", "curriculum.delete");
 $router->get("/usuarios", "UsersController:index", "users.index");
 $router->post("/usuarios/create", "UsersController:create", "users.create");
 $router->post("/usuarios/update", "UsersController:update", "users.update");

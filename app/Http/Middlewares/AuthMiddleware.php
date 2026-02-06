@@ -61,7 +61,10 @@ class AuthMiddleware
         $uri = strtok($uri, '?');
         
         // Remove base URL se houver
-        $uri = str_replace(parse_url(URL_BASE, PHP_URL_PATH), '', $uri);
+        $basePath = parse_url(URL_BASE, PHP_URL_PATH) ?? '';
+        if (!empty($basePath)) {
+            $uri = str_replace($basePath, '', $uri);
+        }
         
         // Extrai partes da URL
         $parts = array_filter(explode('/', trim($uri, '/')));
