@@ -3,30 +3,75 @@
 namespace App\Helpers;
 
 /**
- * Sistema de ACL (Access Control List)
- * Gerencia roles, permissões e menu dinâmico
+ * Sistema de ACL (Access Control List) com Permissões Granulares
+ * Gerencia roles, permissões CRUD e menu dinâmico
  */
 class ACL
 {
     /**
-     * Definição de Roles e suas Permissões
+     * Ações padrão disponíveis
+     */
+    public const ACTIONS = [
+        'view' => 'Visualizar',
+        'create' => 'Criar',
+        'update' => 'Editar',
+        'delete' => 'Excluir',
+        'export' => 'Exportar',
+        'import' => 'Importar',
+        'print' => 'Imprimir',
+    ];
+
+    /**
+     * Ações específicas por módulo
+     */
+    public const MODULE_ACTIONS = [
+        'curriculos' => ['approve' => 'Aprovar', 'reject' => 'Reprovar', 'schedule' => 'Agendar Entrevista'],
+        'usuarios' => ['reset_password' => 'Resetar Senha', 'activate' => 'Ativar', 'deactivate' => 'Desativar'],
+        'whatsapp' => ['send' => 'Enviar Mensagem', 'connect' => 'Conectar', 'disconnect' => 'Desconectar'],
+        'sliders' => ['reorder' => 'Reordenar', 'toggle_status' => 'Ativar/Desativar'],
+    ];
+
+    /**
+     * Definição de Roles com Permissões Granulares
      */
     private const ROLES = [
         'admin' => [
             'label' => 'Administrador',
-            'permissions' => ['dashboard', 'sliders', 'curriculos', 'usuarios', 'configuracoes', 'whatsapp']
+            'description' => 'Acesso total ao sistema',
+            'permissions' => [
+                'dashboard' => ['view'],
+                'sliders' => ['view', 'create', 'update', 'delete', 'reorder', 'toggle_status'],
+                'curriculos' => ['view', 'create', 'update', 'delete', 'export', 'approve', 'reject', 'schedule'],
+                'usuarios' => ['view', 'create', 'update', 'delete', 'reset_password', 'activate', 'deactivate'],
+                'configuracoes' => ['view', 'update'],
+                'whatsapp' => ['view', 'create', 'update', 'delete', 'send', 'connect', 'disconnect'],
+            ]
         ],
         'manager' => [
             'label' => 'Gerente',
-            'permissions' => ['dashboard', 'sliders', 'curriculos', 'whatsapp']
+            'description' => 'Gerencia conteúdo e equipe',
+            'permissions' => [
+                'dashboard' => ['view'],
+                'sliders' => ['view', 'create', 'update', 'reorder'],
+                'curriculos' => ['view', 'update', 'export', 'approve', 'reject', 'schedule'],
+                'whatsapp' => ['view', 'send'],
+            ]
         ],
         'operator' => [
             'label' => 'Operador',
-            'permissions' => ['dashboard', 'curriculos', 'whatsapp']
+            'description' => 'Opera funcionalidades básicas',
+            'permissions' => [
+                'dashboard' => ['view'],
+                'curriculos' => ['view', 'update', 'schedule'],
+                'whatsapp' => ['view', 'send'],
+            ]
         ],
         'viewer' => [
             'label' => 'Visualizador',
-            'permissions' => ['dashboard']
+            'description' => 'Apenas visualização',
+            'permissions' => [
+                'dashboard' => ['view'],
+            ]
         ]
     ];
 
@@ -39,61 +84,88 @@ class ACL
             'label' => 'Início',
             'icon' => 'fa-tachometer-alt',
             'url' => 'dashboard',
-            'required_permission' => 'dashboard'
+            'module' => 'dashboard'
         ],
         [
             'slug' => 'sliders',
             'label' => 'Sliders',
             'icon' => 'fa-images',
             'url' => 'dashboard/sliders',
-            'required_permission' => 'sliders'
+            'module' => 'sliders'
         ],
         [
             'slug' => 'curriculos',
             'label' => 'Currículos',
             'icon' => 'fa-user-tie',
             'url' => 'dashboard/curriculos',
-            'required_permission' => 'curriculos'
+            'module' => 'curriculos'
         ],
         [
             'slug' => 'whatsapp',
             'label' => 'WhatsApp',
             'icon' => 'fa-whatsapp',
             'url' => 'dashboard/whatsapp',
-            'required_permission' => 'whatsapp'
+            'module' => 'whatsapp'
         ],
         [
             'slug' => 'usuarios',
             'label' => 'Usuários',
             'icon' => 'fa-users',
             'url' => 'dashboard/usuarios',
-            'required_permission' => 'usuarios'
+            'module' => 'usuarios'
         ],
         [
             'slug' => 'configuracoes',
             'label' => 'Configurações',
             'icon' => 'fa-cog',
             'url' => 'dashboard/configuracoes',
-            'required_permission' => 'configuracoes'
+            'module' => 'configuracoes'
         ]
     ];
 
     /**
-     * Verifica se um role tem uma permissão específica
+     * Verifica se um role pode executar uma ação em um módulo
+     * 
+     * @param string $role Role do usuário
+     * @param string $module Módulo (ex: 'sliders', 'curriculos')
+     * @param string $action Ação (ex: 'create', 'delete', 'approve')
+     * @return bool
      */
-    public static function hasPermission(string $role, string $permission): bool
+    public static function can(string $role, string $module, string $action): bool
     {
         if (!isset(self::ROLES[$role])) {
             return false;
         }
 
-        return in_array($permission, self::ROLES[$role]['permissions']);
+        $modulePermissions = self::ROLES[$role]['permissions'][$module] ?? [];
+        
+        return in_array($action, $modulePermissions);
+    }
+
+    /**
+     * Verifica se role tem acesso ao módulo (qualquer ação)
+     */
+    public static function hasModuleAccess(string $role, string $module): bool
+    {
+        if (!isset(self::ROLES[$role])) {
+            return false;
+        }
+
+        return isset(self::ROLES[$role]['permissions'][$module]);
+    }
+
+    /**
+     * Retorna todas as ações permitidas para um módulo
+     */
+    public static function getModuleActions(string $role, string $module): array
+    {
+        return self::ROLES[$role]['permissions'][$module] ?? [];
     }
 
     /**
      * Retorna todas as permissões de um role
      */
-    public static function getPermissions(string $role): array
+    public static function getAllPermissions(string $role): array
     {
         return self::ROLES[$role]['permissions'] ?? [];
     }
@@ -107,25 +179,33 @@ class ACL
     }
 
     /**
+     * Retorna a descrição de um role
+     */
+    public static function getRoleDescription(string $role): string
+    {
+        return self::ROLES[$role]['description'] ?? '';
+    }
+
+    /**
      * Retorna todos os roles disponíveis
      */
     public static function getAllRoles(): array
     {
-        return array_map(fn($role) => [
+        return array_map(fn($role, $data) => [
             'value' => $role,
-            'label' => self::ROLES[$role]['label']
-        ], array_keys(self::ROLES));
+            'label' => $data['label'],
+            'description' => $data['description']
+        ], array_keys(self::ROLES), self::ROLES);
     }
 
     /**
      * Retorna menu filtrado por role do usuário
+     * Só mostra itens de módulos que o usuário tem acesso
      */
     public static function getMenuForRole(string $role): array
     {
-        $permissions = self::getPermissions($role);
-        
-        return array_filter(self::MENU_ITEMS, function($item) use ($permissions) {
-            return in_array($item['required_permission'], $permissions);
+        return array_filter(self::MENU_ITEMS, function($item) use ($role) {
+            return self::hasModuleAccess($role, $item['module']);
         });
     }
 
@@ -138,14 +218,6 @@ class ACL
     }
 
     /**
-     * Verifica se usuário pode acessar uma rota/recurso
-     */
-    public static function canAccess(string $role, string $permission): bool
-    {
-        return self::hasPermission($role, $permission);
-    }
-
-    /**
      * Valida se role existe
      */
     public static function isValidRole(string $role): bool
@@ -154,20 +226,76 @@ class ACL
     }
 
     /**
-     * Retorna permissões em formato para checkbox (formulário de usuários)
+     * Retorna lista de módulos disponíveis
      */
-    public static function getPermissionsForForm(): array
+    public static function getAvailableModules(): array
     {
-        $allPermissions = [];
+        return array_unique(array_column(self::MENU_ITEMS, 'module'));
+    }
+
+    /**
+     * Retorna todas as ações disponíveis para um módulo
+     */
+    public static function getModuleAvailableActions(string $module): array
+    {
+        $actions = self::ACTIONS;
         
-        foreach (self::MENU_ITEMS as $item) {
-            $allPermissions[] = [
-                'value' => $item['slug'],
-                'label' => $item['label'],
-                'icon' => $item['icon']
-            ];
+        // Adiciona ações específicas do módulo
+        if (isset(self::MODULE_ACTIONS[$module])) {
+            $actions = array_merge($actions, self::MODULE_ACTIONS[$module]);
         }
         
-        return $allPermissions;
+        return $actions;
+    }
+
+    /**
+     * Gera matriz de permissões para exibição (útil para debug/admin)
+     */
+    public static function getPermissionsMatrix(): array
+    {
+        $matrix = [];
+        
+        foreach (self::ROLES as $role => $data) {
+            $matrix[$role] = [
+                'label' => $data['label'],
+                'description' => $data['description'],
+                'modules' => []
+            ];
+            
+            foreach ($data['permissions'] as $module => $actions) {
+                $matrix[$role]['modules'][$module] = $actions;
+            }
+        }
+        
+        return $matrix;
+    }
+
+    /**
+     * Valida múltiplas permissões de uma vez (AND)
+     * Útil para ações que requerem múltiplas permissões
+     */
+    public static function canAll(string $role, string $module, array $actions): bool
+    {
+        foreach ($actions as $action) {
+            if (!self::can($role, $module, $action)) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+
+    /**
+     * Valida se tem pelo menos uma das permissões (OR)
+     */
+    public static function canAny(string $role, string $module, array $actions): bool
+    {
+        foreach ($actions as $action) {
+            if (self::can($role, $module, $action)) {
+                return true;
+            }
+        }
+        
+        return false;
     }
 }
