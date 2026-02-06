@@ -10,7 +10,7 @@ volumes:
     driver: local
 
 services:
-  frontend-member-ship-odeon-v3:
+  frontend-dellaconsul:
     hostname: frontend
     environment:
       - TZ=America/Sao_Paulo

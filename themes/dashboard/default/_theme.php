@@ -76,7 +76,7 @@ else:?>
                 <i class="fas fa-home"></i>
                 <span>Voltar ao Site</span>
             </a>
-            <a href="#" class="menu-link" id="logoutBtn">
+            <a href="<?= urlBase('auth/logout'); ?>" class="menu-link">
                 <i class="fas fa-sign-out-alt"></i>
                 <span>Sair</span>
             </a>
@@ -169,18 +169,6 @@ endif; ?>
         $('.menu-link').on('click', function () {
             $('.menu-link').removeClass('active');
             $(this).addClass('active');
-        });
-
-        // Logout functionality
-        $('#logoutBtn').on('click', function (e) {
-            e.preventDefault();
-            if (confirm('Tem certeza que deseja sair?')) {
-                // Simulate logout
-                showToast('Logout realizado com sucesso!', 'success');
-                setTimeout(function () {
-                    window.location.href = '../intranet.html';
-                }, 1500);
-            }
         });
 
     });

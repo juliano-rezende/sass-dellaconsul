@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Dashboard;
 
-use Database\Connection;
+use App\Models\User;
 use App\Helpers\ACL;
 use League\Plates\Engine;
 
@@ -29,17 +29,15 @@ class UsersController
         }
 
         try {
-            $pdo = Connection::getInstance();
-            $stmt = $pdo->query("
-                SELECT id, name, email, role, department, status, phone, avatar, last_login, created_at
-                FROM users
-                ORDER BY created_at DESC
-            ");
-            $users = $stmt->fetchAll();
+            // Busca usuários usando o Model
+            $users = User::orderBy('created_at', 'DESC')->get();
+            
+            // Converte para array para manter compatibilidade com a view
+            $usersArray = array_map(fn($user) => $user->toArray(), $users);
 
             echo $this->view->render("pages/users", [
                 "title" => "Usuários",
-                "users" => $users
+                "users" => $usersArray
             ]);
         } catch (\Exception $e) {
             echo "Erro ao carregar usuários: " . $e->getMessage();
@@ -68,7 +66,7 @@ class UsersController
             $status = $_POST['status'] ?? 'pending';
             $phone = filter_input(INPUT_POST, 'phone', FILTER_SANITIZE_SPECIAL_CHARS);
 
-            // Validações
+            // Validações básicas
             if (empty($name) || empty($email) || empty($password)) {
                 echo json_encode(['success' => false, 'message' => 'Preencha todos os campos obrigatórios']);
                 return;
@@ -79,32 +77,25 @@ class UsersController
                 return;
             }
 
-            // Verifica se email já existe
-            $pdo = Connection::getInstance();
-            $stmt = $pdo->prepare("SELECT id FROM users WHERE email = :email");
-            $stmt->execute(['email' => $email]);
-            if ($stmt->fetch()) {
-                echo json_encode(['success' => false, 'message' => 'E-mail já cadastrado']);
-                return;
-            }
-
-            // Insere usuário
-            $stmt = $pdo->prepare("
-                INSERT INTO users (name, email, password, role, department, status, phone)
-                VALUES (:name, :email, :password, :role, :department, :status, :phone)
-            ");
-
-            $stmt->execute([
+            // Cria usuário usando o Model
+            $user = User::create([
                 'name' => $name,
                 'email' => $email,
-                'password' => password_hash($password, PASSWORD_DEFAULT),
+                'password' => $password, // Hash automático no beforeSave
                 'role' => $role,
                 'department' => $department,
                 'status' => $status,
                 'phone' => $phone
             ]);
 
-            echo json_encode(['success' => true, 'message' => 'Usuário criado com sucesso']);
+            if ($user) {
+                echo json_encode(['success' => true, 'message' => 'Usuário criado com sucesso']);
+            } else {
+                // Pega erros de validação do model
+                $errors = (new User())->errors();
+                $errorMessage = !empty($errors) ? implode(', ', array_map(fn($e) => implode(', ', $e), $errors)) : 'Erro ao criar usuário';
+                echo json_encode(['success' => false, 'message' => $errorMessage]);
+            }
 
         } catch (\Exception $e) {
             echo json_encode(['success' => false, 'message' => 'Erro ao criar usuário: ' . $e->getMessage()]);
@@ -126,40 +117,43 @@ class UsersController
 
         try {
             $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
-            $name = filter_input(INPUT_POST, 'name', FILTER_SANITIZE_SPECIAL_CHARS);
-            $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
-            $role = $_POST['role'] ?? '';
-            $department = $_POST['department'] ?? '';
-            $status = $_POST['status'] ?? '';
-            $phone = filter_input(INPUT_POST, 'phone', FILTER_SANITIZE_SPECIAL_CHARS);
 
             if (!$id) {
                 echo json_encode(['success' => false, 'message' => 'ID inválido']);
                 return;
             }
 
-            $pdo = Connection::getInstance();
+            // Busca usuário usando o Model
+            $user = User::findById($id);
+
+            if (!$user) {
+                echo json_encode(['success' => false, 'message' => 'Usuário não encontrado']);
+                return;
+            }
+
+            // Atualiza campos
+            $user->name = filter_input(INPUT_POST, 'name', FILTER_SANITIZE_SPECIAL_CHARS);
+            $user->email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
+            $user->role = $_POST['role'] ?? $user->role;
+            $user->department = $_POST['department'] ?? $user->department;
+            $user->status = $_POST['status'] ?? $user->status;
             
-            // Monta query dinâmica
-            $fields = ['name = :name', 'email = :email', 'role = :role', 'department = :department', 'status = :status'];
-            $params = ['id' => $id, 'name' => $name, 'email' => $email, 'role' => $role, 'department' => $department, 'status' => $status];
-            
-            if (!empty($phone)) {
-                $fields[] = 'phone = :phone';
-                $params['phone'] = $phone;
+            if (!empty($_POST['phone'])) {
+                $user->phone = filter_input(INPUT_POST, 'phone', FILTER_SANITIZE_SPECIAL_CHARS);
             }
 
             // Atualiza senha se fornecida
             if (!empty($_POST['password'])) {
-                $fields[] = 'password = :password';
-                $params['password'] = password_hash($_POST['password'], PASSWORD_DEFAULT);
+                $user->password = $_POST['password']; // Hash automático no beforeSave
             }
 
-            $sql = "UPDATE users SET " . implode(', ', $fields) . " WHERE id = :id";
-            $stmt = $pdo->prepare($sql);
-            $stmt->execute($params);
-
-            echo json_encode(['success' => true, 'message' => 'Usuário atualizado com sucesso']);
+            if ($user->save()) {
+                echo json_encode(['success' => true, 'message' => 'Usuário atualizado com sucesso']);
+            } else {
+                $errors = $user->errors();
+                $errorMessage = !empty($errors) ? implode(', ', array_map(fn($e) => implode(', ', $e), $errors)) : 'Erro ao atualizar usuário';
+                echo json_encode(['success' => false, 'message' => $errorMessage]);
+            }
 
         } catch (\Exception $e) {
             echo json_encode(['success' => false, 'message' => 'Erro ao atualizar usuário: ' . $e->getMessage()]);
@@ -167,7 +161,7 @@ class UsersController
     }
 
     /**
-     * Deleta usuário
+     * Deleta usuário (soft delete)
      */
     public function delete(): void
     {
@@ -193,11 +187,19 @@ class UsersController
                 return;
             }
 
-            $pdo = Connection::getInstance();
-            $stmt = $pdo->prepare("DELETE FROM users WHERE id = :id");
-            $stmt->execute(['id' => $id]);
+            // Busca e deleta usuário usando o Model (soft delete)
+            $user = User::findById($id);
 
-            echo json_encode(['success' => true, 'message' => 'Usuário deletado com sucesso']);
+            if (!$user) {
+                echo json_encode(['success' => false, 'message' => 'Usuário não encontrado']);
+                return;
+            }
+
+            if ($user->delete()) {
+                echo json_encode(['success' => true, 'message' => 'Usuário deletado com sucesso']);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Erro ao deletar usuário']);
+            }
 
         } catch (\Exception $e) {
             echo json_encode(['success' => false, 'message' => 'Erro ao deletar usuário: ' . $e->getMessage()]);

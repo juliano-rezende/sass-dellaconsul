@@ -39,7 +39,10 @@ RUN docker-php-ext-install \
     simplexml \
     pcntl \
     gd \
-    fileinfo
+    fileinfo \
+    pdo \
+    pdo_mysql \
+    mysqli
 
 # Instalação do Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer

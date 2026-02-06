@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use Database\Connection;
+use App\Models\User;
 use App\Helpers\ACL;
 
 class AuthController
@@ -23,16 +23,8 @@ class AuthController
                 return;
             }
 
-            // Busca usuário no banco
-            $pdo = Connection::getInstance();
-            $stmt = $pdo->prepare("
-                SELECT id, name, email, password, role, department, status, avatar
-                FROM users 
-                WHERE email = :email
-                LIMIT 1
-            ");
-            $stmt->execute(['email' => $email]);
-            $user = $stmt->fetch();
+            // Busca usuário usando o Model
+            $user = User::where('email', $email)->first();
 
             if (!$user) {
                 echo json_encode(['success' => false, 'message' => 'Usuário não encontrado']);
@@ -40,13 +32,13 @@ class AuthController
             }
 
             // Verifica status
-            if ($user['status'] !== 'active') {
+            if (!$user->isActive()) {
                 echo json_encode(['success' => false, 'message' => 'Usuário inativo ou pendente']);
                 return;
             }
 
-            // Verifica senha
-            if (!password_verify($password, $user['password'])) {
+            // Verifica senha usando método do model
+            if (!$user->verifyPassword($password)) {
                 echo json_encode(['success' => false, 'message' => 'Senha incorreta']);
                 return;
             }
@@ -56,17 +48,16 @@ class AuthController
                 session_start();
             }
 
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['user_name'] = $user['name'];
-            $_SESSION['user_email'] = $user['email'];
-            $_SESSION['user_role'] = $user['role'];
-            $_SESSION['user_department'] = $user['department'];
-            $_SESSION['user_avatar'] = $user['avatar'];
+            $_SESSION['user_id'] = $user->id;
+            $_SESSION['user_name'] = $user->name;
+            $_SESSION['user_email'] = $user->email;
+            $_SESSION['user_role'] = $user->role;
+            $_SESSION['user_department'] = $user->department;
+            $_SESSION['user_avatar'] = $user->avatar;
             $_SESSION['logged_in'] = true;
 
-            // Atualiza last_login
-            $stmt = $pdo->prepare("UPDATE users SET last_login = NOW() WHERE id = :id");
-            $stmt->execute(['id' => $user['id']]);
+            // Atualiza last_login usando método do model
+            $user->updateLastLogin();
 
             echo json_encode([
                 'success' => true,
@@ -84,11 +75,23 @@ class AuthController
      */
     public function logout(): void
     {
+        // Inicia sessão se necessário
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
 
+        // Limpa todas as variáveis de sessão
+        $_SESSION = [];
+
+        // Destroi o cookie de sessão se existir
+        if (isset($_COOKIE[session_name()])) {
+            setcookie(session_name(), '', time() - 3600, '/');
+        }
+
+        // Destroi a sessão
         session_destroy();
+
+        // Redireciona para a página de login
         header('Location: ' . urlBase('area-segura'));
         exit;
     }
