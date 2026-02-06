@@ -92,18 +92,25 @@ class CareersController
     }
 
     /**
-     * Processa upload de arquivo PDF
+     * Processa upload de arquivo (PDF, DOC, DOCX)
      */
     private function handleFileUpload(): ?string
     {
-        if (!isset($_FILES['curriculum_file']) || $_FILES['curriculum_file']['error'] !== UPLOAD_ERR_OK) {
+        // Tenta ambos os nomes de campo
+        $fileKey = isset($_FILES['curriculum_file']) ? 'curriculum_file' : (isset($_FILES['curriculo']) ? 'curriculo' : null);
+        
+        if (!$fileKey || $_FILES[$fileKey]['error'] !== UPLOAD_ERR_OK) {
             return null;
         }
 
-        $file = $_FILES['curriculum_file'];
+        $file = $_FILES[$fileKey];
         
-        // Valida tipo de arquivo (apenas PDF)
-        $allowedTypes = ['application/pdf'];
+        // Valida tipo de arquivo (PDF, DOC, DOCX)
+        $allowedTypes = [
+            'application/pdf',
+            'application/msword',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        ];
         $finfo = finfo_open(FILEINFO_MIME_TYPE);
         $mimeType = finfo_file($finfo, $file['tmp_name']);
         finfo_close($finfo);
@@ -114,7 +121,8 @@ class CareersController
 
         // Valida extensão
         $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-        if ($extension !== 'pdf') {
+        $allowedExtensions = ['pdf', 'doc', 'docx'];
+        if (!in_array($extension, $allowedExtensions)) {
             return null;
         }
 
@@ -124,18 +132,35 @@ class CareersController
         }
 
         // Cria diretório se não existir
-        $uploadDir = __DIR__ . '/../../../public/arquivos/curriculuns/';
+        // O controller está em app/Http/Controllers/Site/
+        // Precisamos ir para public/arquivos/curriculuns/ na raiz do projeto
+        $rootDir = dirname(__DIR__, 4); // Raiz do projeto
+        $uploadDir = $rootDir . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'arquivos' . DIRECTORY_SEPARATOR . 'curriculuns' . DIRECTORY_SEPARATOR;
+        
         if (!is_dir($uploadDir)) {
-            mkdir($uploadDir, 0755, true);
+            if (!mkdir($uploadDir, 0755, true)) {
+                return null;
+            }
         }
 
-        // Gera nome único
-        $filename = uniqid('curriculum_', true) . '.pdf';
+        // Verifica se o diretório é gravável
+        if (!is_writable($uploadDir)) {
+            @chmod($uploadDir, 0755);
+            if (!is_writable($uploadDir)) {
+                return null;
+            }
+        }
+
+        // Gera nome único mantendo a extensão original
+        $filename = uniqid('curriculum_', true) . '.' . $extension;
         $filepath = $uploadDir . $filename;
 
         // Move arquivo
         if (move_uploaded_file($file['tmp_name'], $filepath)) {
-            return 'arquivos/curriculuns/' . $filename;
+            // Verifica se o arquivo foi realmente salvo
+            if (file_exists($filepath) && filesize($filepath) > 0) {
+                return 'public/arquivos/curriculuns/' . $filename;
+            }
         }
 
         return null;

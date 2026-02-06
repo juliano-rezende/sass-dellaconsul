@@ -2,9 +2,10 @@
 
 namespace App\Models;
 
-use App\Traits\HasTimestamps;
-use App\Traits\SoftDeletes;
-use App\Traits\HasRelationships;
+use App\Database\ORM\Base\BaseModel;
+use App\Database\ORM\Traits\HasTimestamps;
+use App\Database\ORM\Traits\SoftDeletes;
+use App\Database\ORM\Traits\HasRelationships;
 
 /**
  * Curriculum Model

@@ -194,6 +194,7 @@
         background: #f8f9fa;
         transition: all 0.3s ease;
         cursor: pointer;
+        position: relative;
     }
 
     .file-upload-area:hover {
@@ -448,17 +449,24 @@
                             </div>
 
                             <div class="col-md-6">
-                                <label for="cargo_interesse" class="form-label">Cargo de Interesse *</label>
-                                <select class="form-control" id="cargo_interesse" name="cargo_interesse" required>
-                                    <option value="">Selecione...</option>
-                                    <option value="zelador">Zelador(a)</option>
-                                    <option value="porteiro">Porteiro(a)</option>
-                                    <option value="administrador">Administrador(a) de Condomínio</option>
-                                    <option value="manutencao">Técnico de Manutenção</option>
-                                    <option value="limpeza">Auxiliar de Limpeza</option>
-                                    <option value="seguranca">Vigilante</option>
-                                    <option value="outro">Outro</option>
+                                <label for="career_area_id" class="form-label">Área de Interesse *</label>
+                                <select class="form-control" id="career_area_id" name="career_area_id" required>
+                                    <option value="">Selecione uma área...</option>
+                                    <?php if (!empty($careerAreas)): ?>
+                                        <?php foreach ($careerAreas as $area): ?>
+                                            <option value="<?= $area['id'] ?>"><?= htmlspecialchars($area['name']) ?></option>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        <option value="1">Administração</option>
+                                        <option value="2">Manutenção</option>
+                                        <option value="3">Segurança</option>
+                                        <option value="4">Limpeza</option>
+                                    <?php endif; ?>
                                 </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="cargo_interesse" class="form-label">Cargo Específico</label>
+                                <input type="text" class="form-control" id="cargo_interesse" name="cargo_interesse" placeholder="Ex: Zelador, Porteiro, etc.">
                             </div>
 
                             <div class="col-md-6">
@@ -566,7 +574,7 @@
                                         Formatos aceitos: PDF, DOC, DOCX (Máximo: 5MB)
                                     </div>
                                     <input type="file" id="curriculo" name="curriculo" accept=".pdf,.doc,.docx"
-                                           style="display: none;" required>
+                                           style="position: absolute; opacity: 0; width: 0; height: 0; overflow: hidden;" required>
                                 </div>
                                 <div id="fileInfo" class="mt-3" style="display: none;">
                                     <div class="alert alert-success">
@@ -615,17 +623,36 @@
 
 <?php $this->start("js"); ?>
 <script>
+    // Verifica se jQuery está carregado
+    if (typeof jQuery === 'undefined') {
+        console.error('jQuery não está carregado!');
+    }
+    
     $(document).ready(function () {
+        console.log('Document ready - Careers page');
+        
+        // Verifica se os elementos existem
+        if ($('#fileUploadArea').length === 0) {
+            console.error('Elemento #fileUploadArea não encontrado!');
+        }
+        if ($('#curriculo').length === 0) {
+            console.error('Elemento #curriculo não encontrado!');
+        }
+        
         // Máscara para CPF
-        $('#cpf').mask('000.000.000-00');
+        if ($('#cpf').length > 0 && typeof $.fn.mask !== 'undefined') {
+            $('#cpf').mask('000.000.000-00');
+        }
 
         // Máscara para telefone
-        $('#telefone').mask('(00) 0000-0000');
-        $('#celular').mask('(00) 00000-0000');
-        $('#whatsapp').mask('(00) 00000-0000');
+        if (typeof $.fn.mask !== 'undefined') {
+            $('#telefone').mask('(00) 0000-0000');
+            $('#celular').mask('(00) 00000-0000');
+            $('#whatsapp').mask('(00) 00000-0000');
 
-        // Máscara para CEP
-        $('#cep').mask('00000-000');
+            // Máscara para CEP
+            $('#cep').mask('00000-000');
+        }
 
         // Busca CEP
         $('#cep').on('blur', function () {
@@ -642,14 +669,41 @@
             }
         });
 
-        // Upload de arquivo
-        $('#fileUploadArea').on('click', function () {
-            $('#curriculo').click();
+        // Upload de arquivo - múltiplas formas de garantir que funcione
+        $('#fileUploadArea').on('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('File upload area clicked');
+            
+            // Tenta múltiplas formas de disparar o click
+            const fileInput = document.getElementById('curriculo');
+            if (fileInput) {
+                fileInput.click();
+            } else {
+                $('#curriculo').click();
+            }
         });
 
-        $('#curriculo').on('change', function () {
+        // Também permite clicar diretamente no input (caso esteja visível)
+        $('#curriculo').on('click', function (e) {
+            e.stopPropagation();
+            console.log('File input clicked directly');
+        });
+        
+        // Fallback: adiciona listener também no elemento nativo
+        const fileInputNative = document.getElementById('curriculo');
+        if (fileInputNative) {
+            fileInputNative.addEventListener('click', function(e) {
+                console.log('Native file input clicked');
+            });
+        }
+
+        $('#curriculo').on('change', function (e) {
+            console.log('File input changed');
             const file = this.files[0];
             if (file) {
+                console.log('File selected:', file.name, file.type, file.size);
+                
                 // Validar tamanho (5MB)
                 if (file.size > 5 * 1024 * 1024) {
                     alert('O arquivo é muito grande. Tamanho máximo: 5MB');
@@ -659,7 +713,10 @@
 
                 // Validar tipo
                 const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-                if (!allowedTypes.includes(file.type)) {
+                const allowedExtensions = ['pdf', 'doc', 'docx'];
+                const fileExtension = file.name.split('.').pop().toLowerCase();
+                
+                if (!allowedTypes.includes(file.type) && !allowedExtensions.includes(fileExtension)) {
                     alert('Tipo de arquivo não permitido. Use PDF, DOC ou DOCX');
                     this.value = '';
                     return;
@@ -668,6 +725,8 @@
                 $('#fileName').text(file.name);
                 $('#fileInfo').show();
                 $('#fileUploadArea').hide();
+            } else {
+                console.log('No file selected');
             }
         });
 
@@ -710,20 +769,124 @@
                 return;
             }
 
-            if (!$('#curriculo')[0].files.length) {
+            const curriculumFile = $('#curriculo')[0].files[0];
+            if (!curriculumFile) {
                 alert('Por favor, anexe seu currículo');
                 return;
             }
 
-            // Aqui você pode adicionar o código para enviar o formulário
-            // Por exemplo, usando AJAX para enviar para o servidor
+            // Valida campos obrigatórios
+            const nome = $('#nome').val().trim();
+            const email = $('#email').val().trim();
+            const telefone = $('#telefone').val().trim();
+            const careerAreaId = $('#career_area_id').val();
+            const cargoInteresse = $('#cargo_interesse').val().trim();
 
-            alert('Currículo enviado com sucesso! Nossa equipe entrará em contato em até 48 horas.');
+            if (!nome || !email || !telefone || !careerAreaId) {
+                alert('Por favor, preencha todos os campos obrigatórios');
+                return;
+            }
 
-            // Reset do formulário
-            this.reset();
-            $('#fileInfo').hide();
-            $('#fileUploadArea').show();
+            // Mostra loading
+            const submitBtn = $(this).find('button[type="submit"]');
+            const originalText = submitBtn.html();
+            submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-2"></i>Enviando...');
+
+            // Prepara FormData
+            const formData = new FormData();
+            formData.append('name', nome);
+            formData.append('email', email);
+            formData.append('phone', telefone);
+            formData.append('career_area_id', careerAreaId);
+            formData.append('position', cargoInteresse || 'Não especificado');
+            
+            // Mapeia experiência
+            const experiencia = $('#experiencia').val();
+            const experienceMap = {
+                'sem_experiencia': 0,
+                'ate_1_ano': 1,
+                '1_a_3_anos': 2,
+                '3_a_5_anos': 4,
+                '5_a_10_anos': 7,
+                'mais_10_anos': 10
+            };
+            formData.append('experience_years', experienceMap[experiencia] || 0);
+            
+            // Mensagem com informações adicionais
+            let message = '';
+            if ($('#mensagem').val()) {
+                message = $('#mensagem').val().trim();
+            }
+            formData.append('message', message);
+            
+            // Arquivo do currículo
+            formData.append('curriculum_file', curriculumFile);
+
+            // Envia via AJAX
+            $.ajax({
+                url: '<?= urlBase("trabalhe-conosco") ?>',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                dataType: 'json',
+                success: function(response) {
+                    submitBtn.prop('disabled', false).html(originalText);
+                    
+                    // Tenta parsear se for string
+                    let result = response;
+                    if (typeof response === 'string') {
+                        try {
+                            result = JSON.parse(response);
+                        } catch(e) {
+                            console.error('Erro ao parsear resposta:', e, response);
+                            alert('Erro ao processar resposta do servidor');
+                            return;
+                        }
+                    }
+                    
+                    if (result.success) {
+                        alert(result.message || 'Currículo enviado com sucesso! Nossa equipe entrará em contato em até 48 horas.');
+                        // Reset do formulário
+                        $('#careersForm')[0].reset();
+                        $('#fileInfo').hide();
+                        $('#fileUploadArea').show();
+                    } else {
+                        alert(result.message || 'Erro ao enviar currículo. Tente novamente.');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    submitBtn.prop('disabled', false).html(originalText);
+                    
+                    console.error('Erro AJAX:', {
+                        status: xhr.status,
+                        statusText: xhr.statusText,
+                        responseText: xhr.responseText,
+                        error: error
+                    });
+                    
+                    let message = 'Erro ao enviar currículo';
+                    
+                    if (xhr.responseText) {
+                        try {
+                            const response = JSON.parse(xhr.responseText);
+                            if (response.message) {
+                                message = response.message;
+                            }
+                        } catch(e) {
+                            if (xhr.status === 0) {
+                                message = 'Erro de conexão. Verifique sua internet.';
+                            } else if (xhr.status === 500) {
+                                message = 'Erro interno do servidor. Tente novamente mais tarde.';
+                            } else {
+                                message = `Erro ${xhr.status}: ${error || xhr.statusText}`;
+                            }
+                        }
+                    }
+                    
+                    alert(message);
+                }
+            });
         });
 
         // Smooth scroll para links internos

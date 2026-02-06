@@ -149,7 +149,7 @@ else:?>
 <!-- Bootstrap JS -->
 <script src="<?=urlBase(THEME_SITE ."/assets/bootstrap-5.3.7-dist/js/bootstrap.bundle.min.js");?>"></script>
 <!-- Custom JS -->
-<link href="<?=urlBase(THEME_SITE ."/assets/js/script.css");?>" rel="stylesheet">
+<script src="<?=urlBase(THEME_SITE ."/assets/js/script.js");?>"></script>
 <!-- Import js -->
 <?php if ($this->section("js")):
     echo $this->section("js");

@@ -2,15 +2,15 @@
 
 namespace App\Models;
 
-use App\Traits\HasTimestamps;
-use App\Traits\SoftDeletes;
+use App\Database\ORM\Base\BaseModel;
+use App\Database\ORM\Traits\HasTimestamps;
 
 /**
  * Slider Model
  */
 class Slider extends BaseModel
 {
-    use HasTimestamps, SoftDeletes;
+    use HasTimestamps;
     
     protected string $table = 'sliders';
     

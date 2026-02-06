@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Traits;
+namespace App\Database\ORM\Traits;
 
 /**
  * Trait HasRelationships
@@ -14,7 +14,7 @@ trait HasRelationships
     /**
      * Define hasMany relationship
      */
-    protected function hasMany(string $related, string $foreignKey = null, string $localKey = null): array
+    protected function hasMany(string $related, ?string $foreignKey = null, ?string $localKey = null): array
     {
         $foreignKey = $foreignKey ?? $this->getForeignKey();
         $localKey = $localKey ?? $this->primaryKey;
@@ -39,7 +39,7 @@ trait HasRelationships
     /**
      * Define belongsTo relationship
      */
-    protected function belongsTo(string $related, string $foreignKey = null, string $ownerKey = null): ?object
+    protected function belongsTo(string $related, ?string $foreignKey = null, ?string $ownerKey = null): ?object
     {
         $relatedInstance = new $related();
         $foreignKey = $foreignKey ?? $this->getForeignKeyForRelation($related);
@@ -63,7 +63,7 @@ trait HasRelationships
     /**
      * Define hasOne relationship
      */
-    protected function hasOne(string $related, string $foreignKey = null, string $localKey = null): ?object
+    protected function hasOne(string $related, ?string $foreignKey = null, ?string $localKey = null): ?object
     {
         $foreignKey = $foreignKey ?? $this->getForeignKey();
         $localKey = $localKey ?? $this->primaryKey;

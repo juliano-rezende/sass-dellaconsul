@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Models;
+namespace App\Database\ORM\Base;
 
 use Database\Connection;
 use Doctrine\DBAL\Connection as DbalConnection;
-use App\Support\Validator;
+use App\Database\ORM\Support\Validator;
 
 /**
  * BaseModel - Active Record Pattern

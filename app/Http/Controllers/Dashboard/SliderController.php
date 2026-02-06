@@ -32,8 +32,18 @@ class SliderController
             // Busca sliders usando o Model
             $sliders = Slider::make()->orderBy('order_position', 'ASC')->get();
             
-            // Converte para array para manter compatibilidade com a view
-            $slidersArray = array_map(fn($slider) => $slider->toArray(), $sliders);
+            // Converte para array e formata datas para string
+            $slidersArray = array_map(function($slider) {
+                $array = $slider->toArray();
+                // Converte DateTime para string formatada
+                if (isset($array['created_at']) && $array['created_at'] instanceof \DateTime) {
+                    $array['created_at'] = $array['created_at']->format('Y-m-d H:i:s');
+                }
+                if (isset($array['updated_at']) && $array['updated_at'] instanceof \DateTime) {
+                    $array['updated_at'] = $array['updated_at']->format('Y-m-d H:i:s');
+                }
+                return $array;
+            }, $sliders);
 
             echo $this->view->render("pages/slider", [
                 "title" => "Sliders",
@@ -73,11 +83,12 @@ class SliderController
             }
 
             // Upload de imagem
-            $imagePath = $this->handleImageUpload();
-            if (!$imagePath) {
-                echo json_encode(['success' => false, 'message' => 'Erro ao fazer upload da imagem']);
+            $uploadResult = $this->handleImageUpload();
+            if (!$uploadResult['success']) {
+                echo json_encode(['success' => false, 'message' => $uploadResult['message']]);
                 return;
             }
+            $imagePath = $uploadResult['path']; // Já vem como 'public/images/sliders/filename.jpg'
 
             // Busca último order_position
             if ($orderPosition == 0) {
@@ -85,12 +96,12 @@ class SliderController
                 $orderPosition = $lastSlider ? ($lastSlider->getAttribute('order_position') + 1) : 1;
             }
 
-            // Cria slider usando o Model
+            // Cria slider usando o Model (salva apenas o caminho relativo)
             $slider = Slider::create([
                 'title' => $title,
                 'subtitle' => $subtitle ?? '',
                 'description' => $description ?? '',
-                'image' => $imagePath,
+                'image' => $imagePath, // Salva apenas o caminho relativo
                 'button_text' => $buttonText ?? '',
                 'button_link' => $buttonLink ?? '',
                 'order_position' => $orderPosition,
@@ -107,6 +118,51 @@ class SliderController
 
         } catch (\Exception $e) {
             echo json_encode(['success' => false, 'message' => 'Erro ao criar slider: ' . $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Busca um slider específico
+     */
+    public function get(): void
+    {
+        header('Content-Type: application/json');
+
+        // Valida permissão
+        if (!ACL::can($_SESSION['user_role'], 'sliders', 'view')) {
+            echo json_encode(['success' => false, 'message' => 'Sem permissão para visualizar sliders']);
+            return;
+        }
+
+        try {
+            $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
+
+            if (!$id) {
+                echo json_encode(['success' => false, 'message' => 'ID inválido']);
+                return;
+            }
+
+            // Busca slider usando o Model
+            $slider = Slider::findById($id);
+
+            if (!$slider) {
+                echo json_encode(['success' => false, 'message' => 'Slider não encontrado']);
+                return;
+            }
+
+            // Converte para array e formata datas
+            $sliderArray = $slider->toArray();
+            if (isset($sliderArray['created_at']) && $sliderArray['created_at'] instanceof \DateTime) {
+                $sliderArray['created_at'] = $sliderArray['created_at']->format('Y-m-d H:i:s');
+            }
+            if (isset($sliderArray['updated_at']) && $sliderArray['updated_at'] instanceof \DateTime) {
+                $sliderArray['updated_at'] = $sliderArray['updated_at']->format('Y-m-d H:i:s');
+            }
+
+            echo json_encode(['success' => true, 'slider' => $sliderArray]);
+
+        } catch (\Exception $e) {
+            echo json_encode(['success' => false, 'message' => 'Erro ao buscar slider: ' . $e->getMessage()]);
         }
     }
 
@@ -155,14 +211,37 @@ class SliderController
             if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
                 // Remove imagem antiga
                 $oldImage = $slider->image;
-                if ($oldImage && file_exists(__DIR__ . '/../../../public/' . $oldImage)) {
-                    unlink(__DIR__ . '/../../../public/' . $oldImage);
+                if ($oldImage) {
+                    // Se for URL completa (dados antigos), extrai o caminho
+                    if (str_starts_with($oldImage, 'http')) {
+                        $baseUrl = urlBase('');
+                        $oldImagePath = str_replace($baseUrl . '/', '', $oldImage);
+                    } else {
+                        $oldImagePath = $oldImage;
+                    }
+                    
+                    // Garante que tem 'public/' no início (remove 'app/' se existir)
+                    $oldImagePath = preg_replace('#^app/public/#', 'public/', $oldImagePath);
+                    if (!str_starts_with($oldImagePath, 'public/')) {
+                        $oldImagePath = 'public/' . ltrim($oldImagePath, '/');
+                    }
+                    
+                    // Tenta remover o arquivo físico
+                    $rootDir = dirname(__DIR__, 4);
+                    $fullPath = $rootDir . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $oldImagePath);
+                    
+                    if (file_exists($fullPath)) {
+                        @unlink($fullPath);
+                    }
                 }
                 
-                $imagePath = $this->handleImageUpload();
-                if ($imagePath) {
-                    $slider->image = $imagePath;
+                $uploadResult = $this->handleImageUpload();
+                if (!$uploadResult['success']) {
+                    echo json_encode(['success' => false, 'message' => $uploadResult['message']]);
+                    return;
                 }
+                // Salva apenas o caminho relativo
+                $slider->image = $uploadResult['path'];
             }
 
             if ($slider->save()) {
@@ -199,7 +278,7 @@ class SliderController
                 return;
             }
 
-            // Busca e deleta slider usando o Model (soft delete)
+            // Busca slider usando o Model
             $slider = Slider::findById($id);
 
             if (!$slider) {
@@ -209,14 +288,55 @@ class SliderController
 
             // Remove imagem física
             $imagePath = $slider->image;
-            if ($imagePath && file_exists(__DIR__ . '/../../../public/' . $imagePath)) {
-                unlink(__DIR__ . '/../../../public/' . $imagePath);
+            if ($imagePath) {
+                // O caminho já vem como 'public/images/sliders/filename.jpg'
+                // Se por algum motivo vier URL completa (dados antigos), extrai o caminho
+                if (str_starts_with($imagePath, 'http')) {
+                    $baseUrl = urlBase('');
+                    $relativePath = str_replace($baseUrl . '/', '', $imagePath);
+                } else {
+                    $relativePath = $imagePath;
+                }
+                
+                // Remove 'app/' se existir e garante que tem 'public/' no início
+                $relativePath = preg_replace('#^app/public/#', 'public/', $relativePath);
+                if (!str_starts_with($relativePath, 'public/')) {
+                    $relativePath = 'public/' . ltrim($relativePath, '/');
+                }
+                
+                // Tenta remover o arquivo físico
+                $rootDir = dirname(__DIR__, 4);
+                $fullPath = $rootDir . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $relativePath);
+                
+                if (file_exists($fullPath)) {
+                    @unlink($fullPath);
+                }
             }
 
-            if ($slider->delete()) {
-                echo json_encode(['success' => true, 'message' => 'Slider deletado com sucesso']);
-            } else {
-                echo json_encode(['success' => false, 'message' => 'Erro ao deletar slider']);
+            // Realiza delete permanente (hard delete)
+            try {
+                $result = $slider->delete();
+                
+                if ($result) {
+                    echo json_encode(['success' => true, 'message' => 'Slider deletado permanentemente com sucesso']);
+                } else {
+                    $errors = $slider->errors();
+                    $errorMessage = 'Erro ao deletar slider';
+                    
+                    if (!empty($errors)) {
+                        if (is_array($errors)) {
+                            $errorMessage = implode(', ', array_map(function($e) {
+                                return is_array($e) ? implode(', ', $e) : $e;
+                            }, $errors));
+                        } else {
+                            $errorMessage = $errors;
+                        }
+                    }
+                    
+                    echo json_encode(['success' => false, 'message' => $errorMessage]);
+                }
+            } catch (\Exception $deleteException) {
+                echo json_encode(['success' => false, 'message' => 'Erro ao deletar slider: ' . $deleteException->getMessage()]);
             }
 
         } catch (\Exception $e) {
@@ -307,14 +427,30 @@ class SliderController
 
     /**
      * Processa upload de imagem
+     * @return array ['success' => bool, 'path' => string|null, 'message' => string]
      */
-    private function handleImageUpload(): ?string
+    private function handleImageUpload(): array
     {
-        if (!isset($_FILES['image']) || $_FILES['image']['error'] !== UPLOAD_ERR_OK) {
-            return null;
+        if (!isset($_FILES['image'])) {
+            return ['success' => false, 'path' => null, 'message' => 'Nenhuma imagem foi enviada'];
         }
 
         $file = $_FILES['image'];
+        
+        // Verifica erros de upload
+        if ($file['error'] !== UPLOAD_ERR_OK) {
+            $errorMessages = [
+                UPLOAD_ERR_INI_SIZE => 'O arquivo excede o tamanho máximo permitido pelo servidor',
+                UPLOAD_ERR_FORM_SIZE => 'O arquivo excede o tamanho máximo permitido pelo formulário',
+                UPLOAD_ERR_PARTIAL => 'O arquivo foi enviado parcialmente',
+                UPLOAD_ERR_NO_FILE => 'Nenhum arquivo foi enviado',
+                UPLOAD_ERR_NO_TMP_DIR => 'Falta uma pasta temporária',
+                UPLOAD_ERR_CANT_WRITE => 'Falha ao escrever o arquivo no disco',
+                UPLOAD_ERR_EXTENSION => 'Uma extensão PHP interrompeu o upload do arquivo',
+            ];
+            $message = $errorMessages[$file['error']] ?? 'Erro desconhecido no upload (código: ' . $file['error'] . ')';
+            return ['success' => false, 'path' => null, 'message' => $message];
+        }
         
         // Valida tipo de arquivo
         $allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
@@ -323,30 +459,70 @@ class SliderController
         finfo_close($finfo);
 
         if (!in_array($mimeType, $allowedTypes)) {
-            return null;
+            return ['success' => false, 'path' => null, 'message' => 'Tipo de arquivo não permitido. Use apenas JPG, PNG ou WebP'];
         }
 
         // Valida tamanho (max 5MB)
         if ($file['size'] > 5 * 1024 * 1024) {
-            return null;
+            return ['success' => false, 'path' => null, 'message' => 'O arquivo é muito grande. Tamanho máximo: 5MB'];
         }
 
         // Cria diretório se não existir
-        $uploadDir = __DIR__ . '/../../../public/images/sliders/';
+        // O controller está em app/Http/Controllers/Dashboard/
+        // Precisamos ir para public/images/sliders/ na raiz do projeto
+        // Usa a mesma lógica do construtor: dirname(__DIR__, 4) = raiz do projeto
+        $rootDir = dirname(__DIR__, 4); // Raiz do projeto
+        $uploadDir = $rootDir . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR . 'sliders' . DIRECTORY_SEPARATOR;
+        
+        // Cria diretório se não existir
         if (!is_dir($uploadDir)) {
-            mkdir($uploadDir, 0755, true);
+            if (!mkdir($uploadDir, 0755, true)) {
+                return ['success' => false, 'path' => null, 'message' => 'Não foi possível criar o diretório de upload: ' . $uploadDir];
+            }
+        }
+
+        // Verifica se o diretório é gravável
+        if (!is_writable($uploadDir)) {
+            // Tenta corrigir permissões
+            @chmod($uploadDir, 0755);
+            if (!is_writable($uploadDir)) {
+                return ['success' => false, 'path' => null, 'message' => 'O diretório de upload não tem permissão de escrita: ' . $uploadDir];
+            }
+        }
+
+        // Verifica se o arquivo temporário existe
+        if (!file_exists($file['tmp_name'])) {
+            return ['success' => false, 'path' => null, 'message' => 'Arquivo temporário não encontrado'];
+        }
+
+        // Verifica se o arquivo temporário é válido
+        if (!is_uploaded_file($file['tmp_name'])) {
+            return ['success' => false, 'path' => null, 'message' => 'Arquivo não é um upload válido'];
         }
 
         // Gera nome único
-        $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
+        $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
         $filename = uniqid('slider_', true) . '.' . $extension;
         $filepath = $uploadDir . $filename;
 
         // Move arquivo
         if (move_uploaded_file($file['tmp_name'], $filepath)) {
-            return 'images/sliders/' . $filename;
+            // Verifica se o arquivo foi realmente salvo
+            if (file_exists($filepath) && filesize($filepath) > 0) {
+                return ['success' => true, 'path' => 'public/images/sliders/' . $filename, 'message' => 'Upload realizado com sucesso'];
+            } else {
+                return ['success' => false, 'path' => null, 'message' => 'Arquivo foi movido mas não foi encontrado no destino'];
+            }
         }
 
-        return null;
+        // Se falhou, tenta descobrir o motivo
+        $error = error_get_last();
+        $errorMsg = 'Falha ao mover o arquivo para o diretório de destino';
+        if ($error) {
+            $errorMsg .= ': ' . $error['message'];
+        }
+        $errorMsg .= ' | Caminho: ' . $filepath . ' | Temp: ' . $file['tmp_name'];
+        
+        return ['success' => false, 'path' => null, 'message' => $errorMsg];
     }
 }

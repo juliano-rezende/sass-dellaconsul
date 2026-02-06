@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Traits;
+namespace App\Database\ORM\Traits;
 
 /**
  * Trait SoftDeletes

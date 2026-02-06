@@ -105,12 +105,13 @@
     <div class="card mb-4">
         <div class="card-header">
             <h5 class="mb-0">
-                <i class="fas fa-plus me-2"></i>
-                Adicionar Nova Imagem ao Slider
+                <i class="fas fa-plus me-2" id="formIcon"></i>
+                <span id="formTitle">Adicionar Nova Imagem ao Slider</span>
             </h5>
         </div>
         <div class="card-body">
             <form id="sliderForm" class="slider-form">
+                <input type="hidden" id="sliderId" name="id" value="">
                 <div class="row">
                     <div class="col-md-4 mb-3">
                         <label for="sliderTitle" class="form-label">Título do Slide (20 Caracteres)</label>
@@ -171,10 +172,14 @@
                     </label>
                 </div>
 
-                <div class="d-flex justify-content-end">
-                    <button type="submit" class="btn btn-primary">
+                <div class="d-flex justify-content-end gap-2">
+                    <button type="button" class="btn btn-secondary" id="btnCancel" style="display: none;" onclick="cancelEdit()">
+                        <i class="fas fa-times me-2"></i>
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary" id="btnSubmit">
                         <i class="fas fa-save me-2"></i>
-                        Salvar Slide
+                        <span id="btnSubmitText">Salvar Slide</span>
                     </button>
                 </div>
             </form>
@@ -204,89 +209,63 @@
         </div>
         <div class="card-body">
             <div class="row" id="slidersGrid">
-                <!-- Slider Card 1 -->
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="slider-card">
-                        <div class="slider-image">
-                            <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80" alt="Slide 1"
-                                 class="img-fluid">
-                            <div class="slider-overlay">
-                                <div class="btn-group" role="group">
-                                    <button class="btn btn-sm btn-danger" title="Remover">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="slider-status active">
-                                <i class="fas fa-check-circle"></i>
-                            </div>
-                        </div>
-                        <div class="slider-info">
-                            <h6>Gestão Condominial Profissional</h6>
-                            <p class="text-muted">Especialistas em administração de condomínios</p>
-                            <div class="slider-meta">
-                                <span class="badge bg-primary">Ordem: 1</span>
-                                <small class="text-muted">Adicionado em 15/01/2024</small>
-                            </div>
+                <?php if (empty($sliders)): ?>
+                    <div class="col-12">
+                        <div class="alert alert-info text-center">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Nenhum slide cadastrado ainda. Adicione o primeiro slide usando o formulário acima.
                         </div>
                     </div>
-                </div>
-
-                <!-- Slider Card 2 -->
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="slider-card">
-                        <div class="slider-image">
-                            <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80" alt="Slide 2"
-                                 class="img-fluid">
-                            <div class="slider-overlay">
-                                <div class="btn-group" role="group">
-                                    <button class="btn btn-sm btn-danger" title="Remover">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
+                <?php else: ?>
+                    <?php foreach ($sliders as $slider): ?>
+                        <div class="col-lg-4 col-md-6 mb-4" data-slider-id="<?= $slider['id'] ?>">
+                            <div class="slider-card">
+                                <div class="slider-image">
+                                    <img src="<?= !empty($slider['image']) ? urlBase($slider['image']) : '' ?>" 
+                                         alt="<?= htmlspecialchars($slider['title'] ?? 'Slide') ?>"
+                                         class="img-fluid"
+                                         style="width: 100%; height: 200px; object-fit: cover;">
+                                    <div class="slider-overlay">
+                                        <div class="btn-group" role="group">
+                                            <button class="btn btn-sm btn-light me-2" 
+                                                    title="Editar"
+                                                    onclick="editSlider(<?= $slider['id'] ?>)">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-danger" 
+                                                    title="Remover"
+                                                    onclick="deleteSlider(<?= $slider['id'] ?>)">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="slider-status <?= ($slider['status'] ?? 'inactive') === 'active' ? 'active' : 'inactive' ?>" 
+                                         onclick="toggleSliderStatus(<?= $slider['id'] ?>)"
+                                         title="Clique para <?= ($slider['status'] ?? 'inactive') === 'active' ? 'desativar' : 'ativar' ?>">
+                                        <i class="fas fa-<?= ($slider['status'] ?? 'inactive') === 'active' ? 'check' : 'times' ?>-circle"></i>
+                                    </div>
+                                </div>
+                                <div class="slider-info">
+                                    <h6><?= htmlspecialchars($slider['title'] ?? 'Sem título') ?></h6>
+                                    <p class="text-muted"><?= htmlspecialchars($slider['subtitle'] ?? '') ?></p>
+                                    <?php if (!empty($slider['description'])): ?>
+                                        <p class="text-muted small"><?= htmlspecialchars($slider['description']) ?></p>
+                                    <?php endif; ?>
+                                    <div class="slider-meta">
+                                        <span class="badge bg-<?= ($slider['status'] ?? 'inactive') === 'active' ? 'primary' : 'secondary' ?>">
+                                            Ordem: <?= $slider['order_position'] ?? 0 ?>
+                                        </span>
+                                        <small class="text-muted">
+                                            <?php if (!empty($slider['created_at'])): ?>
+                                                <?= date('d/m/Y', strtotime($slider['created_at'])) ?>
+                                            <?php endif; ?>
+                                        </small>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="slider-status active">
-                                <i class="fas fa-check-circle"></i>
-                            </div>
                         </div>
-                        <div class="slider-info">
-                            <h6>Segurança e Manutenção</h6>
-                            <p class="text-muted">Cuidamos de tudo para você</p>
-                            <div class="slider-meta">
-                                <span class="badge bg-primary">Ordem: 2</span>
-                                <small class="text-muted">Adicionado em 14/01/2024</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Slider Card 3 -->
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="slider-card">
-                        <div class="slider-image">
-                            <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80" alt="Slide 3"
-                                 class="img-fluid">
-                            <div class="slider-overlay">
-                                <div class="btn-group" role="group">
-                                    <button class="btn btn-sm btn-danger" title="Remover">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="slider-status inactive">
-                                <i class="fas fa-times-circle"></i>
-                            </div>
-                        </div>
-                        <div class="slider-info">
-                            <h6>Portal do Cliente</h6>
-                            <p class="text-muted">Acesso fácil e rápido aos serviços</p>
-                            <div class="slider-meta">
-                                <span class="badge bg-secondary">Ordem: 3</span>
-                                <small class="text-muted">Adicionado em 13/01/2024</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
             </div>
         </div>
     </div>
@@ -298,6 +277,20 @@
 <script>
     // Sliders specific JavaScript
     $(document).ready(function () {
+        // Desabilita autosave para este formulário específico
+        // O script.js global tem um autosave que escuta todos os inputs
+        // Vamos desabilitar especificamente para o formulário de sliders
+        const sliderForm = $('#sliderForm');
+        
+        // Remove event listeners do autosave global
+        sliderForm.find('input, textarea, select').off('input change');
+        
+        // Adiciona um handler que previne a propagação para o autosave global
+        sliderForm.on('input change', 'input, textarea, select', function(e) {
+            e.stopImmediatePropagation();
+            e.stopPropagation();
+        });
+        
         // Image upload handling
         const imageUploadZone = document.getElementById('imageUploadZone');
         const imageInput = document.getElementById('imageInput');
@@ -339,14 +332,171 @@
             reader.readAsDataURL(file);
         }
 
+        // Desabilita autosave para este formulário
+        $('#sliderForm input, #sliderForm textarea, #sliderForm select').off('input change');
+        
         // Form submission
         $('#sliderForm').on('submit', function (e) {
             e.preventDefault();
-            showToast('Slide salvo com sucesso!', 'success');
-            this.reset();
+            
+            // Validação básica
+            const title = $('#sliderTitle').val().trim();
+            if (!title) {
+                if (typeof showToast !== 'undefined') {
+                    showToast('Por favor, preencha o título do slide', 'error');
+                } else {
+                    alert('Por favor, preencha o título do slide');
+                }
+                $('#sliderTitle').focus();
+                return;
+            }
+            
+            const sliderId = $('#sliderId').val();
+            const isEdit = sliderId && sliderId !== '';
+            const imageFile = imageInput.files[0];
+            
+            // Valida imagem apenas na criação
+            if (!isEdit && !imageFile) {
+                if (typeof showToast !== 'undefined') {
+                    showToast('Por favor, selecione uma imagem', 'error');
+                } else {
+                    alert('Por favor, selecione uma imagem');
+                }
+                return;
+            }
+            
+            // Mostra loading
+            const submitBtn = $('#btnSubmit');
+            const originalText = submitBtn.html();
+            submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-2"></i>Salvando...');
+            
+            const formData = new FormData();
+            if (isEdit) {
+                formData.append('id', sliderId);
+            }
+            formData.append('title', title);
+            formData.append('subtitle', $('#sliderSubtitle').val().trim());
+            formData.append('description', $('#sliderDescription').val().trim());
+            formData.append('button_text', $('#sliderButtonText').val().trim());
+            formData.append('button_link', $('#sliderButtonLink').val().trim());
+            formData.append('order_position', $('#sliderOrder').val() || 0);
+            formData.append('status', $('#sliderActive').is(':checked') ? 'active' : 'inactive');
+            
+            // Adiciona imagem apenas se foi selecionada
+            if (imageFile) {
+                formData.append('image', imageFile);
+            }
+            
+            const url = isEdit ? '<?= urlBase("dashboard/sliders/update") ?>' : '<?= urlBase("dashboard/sliders/create") ?>';
+            
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                dataType: 'json',
+                success: function(response) {
+                    submitBtn.prop('disabled', false).html(originalText);
+                    
+                    // Tenta parsear se for string
+                    let result = response;
+                    if (typeof response === 'string') {
+                        try {
+                            result = JSON.parse(response);
+                        } catch(e) {
+                            console.error('Erro ao parsear resposta:', e, response);
+                            if (typeof showToast !== 'undefined') {
+                                showToast('Erro ao processar resposta do servidor', 'error');
+                            } else {
+                                alert('Erro ao processar resposta do servidor');
+                            }
+                            return;
+                        }
+                    }
+                    
+                    if (result.success) {
+                        const message = result.message || (isEdit ? 'Slide atualizado com sucesso!' : 'Slide criado com sucesso!');
+                        if (typeof showToast !== 'undefined') {
+                            showToast(message, 'success');
+                        } else {
+                            alert(message);
+                        }
+                        
+                        // Limpa formulário
+                        resetForm();
+                        
+                        // Recarrega a página para mostrar as mudanças
+                        setTimeout(() => location.reload(), 1500);
+                    } else {
+                        if (typeof showToast !== 'undefined') {
+                            showToast(result.message || 'Erro ao salvar slide', 'error');
+                        } else {
+                            alert(result.message || 'Erro ao salvar slide');
+                        }
+                    }
+                },
+                error: function(xhr, status, error) {
+                    submitBtn.prop('disabled', false).html(originalText);
+                    
+                    console.error('Erro AJAX:', {
+                        status: xhr.status,
+                        statusText: xhr.statusText,
+                        responseText: xhr.responseText,
+                        error: error
+                    });
+                    
+                    let message = 'Erro ao salvar slide';
+                    
+                    // Tenta extrair mensagem de erro da resposta
+                    if (xhr.responseText) {
+                        try {
+                            const response = JSON.parse(xhr.responseText);
+                            if (response.message) {
+                                message = response.message;
+                            }
+                        } catch(e) {
+                            // Se não for JSON, tenta extrair mensagem de erro HTML
+                            if (xhr.status === 0) {
+                                message = 'Erro de conexão. Verifique sua internet.';
+                            } else if (xhr.status === 500) {
+                                message = 'Erro interno do servidor. Verifique os logs.';
+                            } else if (xhr.status === 403) {
+                                message = 'Sem permissão para realizar esta ação';
+                            } else {
+                                message = `Erro ${xhr.status}: ${xhr.statusText}`;
+                            }
+                        }
+                    } else {
+                        if (xhr.status === 0) {
+                            message = 'Erro de conexão. Verifique sua internet.';
+                        } else {
+                            message = `Erro ${xhr.status}: ${error || xhr.statusText}`;
+                        }
+                    }
+                    
+                    if (typeof showToast !== 'undefined') {
+                        showToast(message, 'error');
+                    } else {
+                        alert(message);
+                    }
+                }
+            });
+        });
+        
+        // Função para resetar formulário
+        function resetForm() {
+            $('#sliderForm')[0].reset();
+            $('#sliderId').val('');
             imagePreview.style.display = 'none';
             imageUploadZone.style.display = 'block';
-        });
+            previewImg.src = '';
+            imageInput.value = '';
+            $('#formIcon').removeClass('fa-edit').addClass('fa-plus');
+            $('#formTitle').text('Adicionar Nova Imagem ao Slider');
+            $('#btnSubmitText').text('Salvar Slide');
+            $('#btnCancel').hide();
+        }
 
         // Search functionality
         $('#searchInput').on('keyup', function () {
@@ -372,26 +522,278 @@
             }
         });
 
-        // Slider card actions
-        $(document).on('click', '.slider-card .btn-light', function () {
-            const action = $(this).find('i').hasClass('fa-edit') ? 'editar' : 'visualizar';
-            showToast(`Ação ${action} iniciada...`, 'info');
-        });
-
-        $(document).on('click', '.slider-card .btn-danger', function () {
-            if (confirm('Tem certeza que deseja remover este slide?')) {
-                $(this).closest('.col-lg-4').fadeOut();
-                showToast('Slide removido com sucesso!', 'success');
+        // Função para deletar slider
+        window.deleteSlider = function(id) {
+            if (!confirm('Tem certeza que deseja remover este slide?')) {
+                return;
             }
-        });
-
-        // Toggle slider status
-        $(document).on('click', '.slider-status', function () {
-            $(this).toggleClass('active inactive');
-            const isActive = $(this).hasClass('active');
-            $(this).find('i').toggleClass('fa-check-circle fa-times-circle');
-            showToast(`Slide ${isActive ? 'ativado' : 'desativado'}!`, 'success');
-        });
+            
+            const formData = new FormData();
+            formData.append('id', id);
+            
+            $.ajax({
+                url: '<?= urlBase("dashboard/sliders/delete") ?>',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                dataType: 'json',
+                success: function(response) {
+                    // Tenta parsear se for string
+                    let result = response;
+                    if (typeof response === 'string') {
+                        try {
+                            result = JSON.parse(response);
+                        } catch(e) {
+                            console.error('Erro ao parsear resposta:', e, response);
+                            if (typeof showToast !== 'undefined') {
+                                showToast('Erro ao processar resposta do servidor', 'error');
+                            } else {
+                                alert('Erro ao processar resposta do servidor');
+                            }
+                            return;
+                        }
+                    }
+                    
+                    if (result.success) {
+                        const message = result.message || 'Slide removido com sucesso!';
+                        if (typeof showToast !== 'undefined') {
+                            showToast(message, 'success');
+                        } else {
+                            alert(message);
+                        }
+                        
+                        $(`[data-slider-id="${id}"]`).fadeOut(300, function() {
+                            $(this).remove();
+                            // Verifica se não há mais sliders
+                            if ($('#slidersGrid .col-lg-4').length === 0) {
+                                $('#slidersGrid').html(`
+                                    <div class="col-12">
+                                        <div class="alert alert-info text-center">
+                                            <i class="fas fa-info-circle me-2"></i>
+                                            Nenhum slide cadastrado ainda. Adicione o primeiro slide usando o formulário acima.
+                                        </div>
+                                    </div>
+                                `);
+                            }
+                        });
+                    } else {
+                        const message = result.message || 'Erro ao remover slide';
+                        if (typeof showToast !== 'undefined') {
+                            showToast(message, 'error');
+                        } else {
+                            alert(message);
+                        }
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Erro AJAX ao deletar:', {
+                        status: xhr.status,
+                        statusText: xhr.statusText,
+                        responseText: xhr.responseText,
+                        error: error
+                    });
+                    
+                    let message = 'Erro ao remover slide';
+                    
+                    // Tenta extrair mensagem de erro da resposta
+                    if (xhr.responseText) {
+                        try {
+                            const response = JSON.parse(xhr.responseText);
+                            if (response.message) {
+                                message = response.message;
+                            }
+                        } catch(e) {
+                            if (xhr.status === 0) {
+                                message = 'Erro de conexão. Verifique sua internet.';
+                            } else if (xhr.status === 500) {
+                                message = 'Erro interno do servidor. Verifique os logs.';
+                            } else if (xhr.status === 403) {
+                                message = 'Sem permissão para realizar esta ação';
+                            } else {
+                                message = `Erro ${xhr.status}: ${xhr.statusText}`;
+                            }
+                        }
+                    } else {
+                        if (xhr.status === 0) {
+                            message = 'Erro de conexão. Verifique sua internet.';
+                        } else {
+                            message = `Erro ${xhr.status}: ${error || xhr.statusText}`;
+                        }
+                    }
+                    
+                    if (typeof showToast !== 'undefined') {
+                        showToast(message, 'error');
+                    } else {
+                        alert(message);
+                    }
+                }
+            });
+        };
+        
+        // Função para alternar status do slider
+        window.toggleSliderStatus = function(id) {
+            const formData = new FormData();
+            formData.append('id', id);
+            
+            $.ajax({
+                url: '<?= urlBase("dashboard/sliders/toggle-status") ?>',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    const result = typeof response === 'string' ? JSON.parse(response) : response;
+                    if (result.success) {
+                        const statusElement = $(`[data-slider-id="${id}"] .slider-status`);
+                        const isActive = result.status === 'active';
+                        
+                        statusElement.toggleClass('active inactive', isActive);
+                        statusElement.find('i')
+                            .removeClass('fa-check-circle fa-times-circle')
+                            .addClass(isActive ? 'fa-check-circle' : 'fa-times-circle');
+                        
+                        // Atualiza badge
+                        const badge = $(`[data-slider-id="${id}"] .badge`);
+                        badge.removeClass('bg-primary bg-secondary')
+                             .addClass(isActive ? 'bg-primary' : 'bg-secondary');
+                        
+                        showToast(result.message || `Slide ${isActive ? 'ativado' : 'desativado'}!`, 'success');
+                    } else {
+                        showToast(result.message || 'Erro ao alterar status', 'error');
+                    }
+                },
+                error: function(xhr) {
+                    let message = 'Erro ao alterar status';
+                    try {
+                        const response = JSON.parse(xhr.responseText);
+                        message = response.message || message;
+                    } catch(e) {}
+                    showToast(message, 'error');
+                }
+            });
+        };
+        
+        // Função para editar slider
+        window.editSlider = function(id) {
+            // Busca dados do slider na página
+            const sliderCard = $(`[data-slider-id="${id}"]`);
+            if (!sliderCard.length) {
+                if (typeof showToast !== 'undefined') {
+                    showToast('Slider não encontrado', 'error');
+                } else {
+                    alert('Slider não encontrado');
+                }
+                return;
+            }
+            
+            // Preenche formulário com dados do slider
+            const title = sliderCard.find('.slider-info h6').text().trim();
+            const subtitle = sliderCard.find('.slider-info p.text-muted').first().text().trim();
+            const description = sliderCard.find('.slider-info p.text-muted.small').text().trim();
+            const orderPosition = sliderCard.find('.badge').text().replace('Ordem: ', '').trim();
+            const isActive = sliderCard.find('.slider-status').hasClass('active');
+            const imageUrl = sliderCard.find('.slider-image img').attr('src');
+            
+            // Busca dados completos via AJAX para pegar button_text e button_link
+            const formData = new FormData();
+            formData.append('id', id);
+            
+            $.ajax({
+                url: '<?= urlBase("dashboard/sliders/get") ?>',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    let result = typeof response === 'string' ? JSON.parse(response) : response;
+                    
+                    if (result.success && result.slider) {
+                        const slider = result.slider;
+                        
+                        // Preenche formulário
+                        $('#sliderId').val(slider.id);
+                        $('#sliderTitle').val(slider.title || title);
+                        $('#sliderSubtitle').val(slider.subtitle || subtitle);
+                        $('#sliderDescription').val(slider.description || description);
+                        $('#sliderButtonText').val(slider.button_text || '');
+                        $('#sliderButtonLink').val(slider.button_link || '');
+                        $('#sliderOrder').val(slider.order_position || orderPosition);
+                        $('#sliderActive').prop('checked', (slider.status || (isActive ? 'active' : 'inactive')) === 'active');
+                        
+                        // Mostra imagem atual
+                        if (imageUrl) {
+                            previewImg.src = imageUrl;
+                            imagePreview.style.display = 'block';
+                            imageUploadZone.style.display = 'none';
+                        }
+                        
+                        // Atualiza UI do formulário
+                        $('#formIcon').removeClass('fa-plus').addClass('fa-edit');
+                        $('#formTitle').text('Editar Slide');
+                        $('#btnSubmitText').text('Atualizar Slide');
+                        $('#btnCancel').show();
+                        
+                        // Scroll para o formulário
+                        $('html, body').animate({
+                            scrollTop: $('#sliderForm').offset().top - 100
+                        }, 500);
+                    } else {
+                        // Se não conseguir buscar via AJAX, usa dados da página
+                        $('#sliderId').val(id);
+                        $('#sliderTitle').val(title);
+                        $('#sliderSubtitle').val(subtitle);
+                        $('#sliderDescription').val(description);
+                        $('#sliderOrder').val(orderPosition);
+                        $('#sliderActive').prop('checked', isActive);
+                        
+                        if (imageUrl) {
+                            previewImg.src = imageUrl;
+                            imagePreview.style.display = 'block';
+                            imageUploadZone.style.display = 'none';
+                        }
+                        
+                        $('#formIcon').removeClass('fa-plus').addClass('fa-edit');
+                        $('#formTitle').text('Editar Slide');
+                        $('#btnSubmitText').text('Atualizar Slide');
+                        $('#btnCancel').show();
+                        
+                        $('html, body').animate({
+                            scrollTop: $('#sliderForm').offset().top - 100
+                        }, 500);
+                    }
+                },
+                error: function() {
+                    // Em caso de erro, usa dados da página mesmo
+                    $('#sliderId').val(id);
+                    $('#sliderTitle').val(title);
+                    $('#sliderSubtitle').val(subtitle);
+                    $('#sliderDescription').val(description);
+                    $('#sliderOrder').val(orderPosition);
+                    $('#sliderActive').prop('checked', isActive);
+                    
+                    if (imageUrl) {
+                        previewImg.src = imageUrl;
+                        imagePreview.style.display = 'block';
+                        imageUploadZone.style.display = 'none';
+                    }
+                    
+                    $('#formIcon').removeClass('fa-plus').addClass('fa-edit');
+                    $('#formTitle').text('Editar Slide');
+                    $('#btnSubmitText').text('Atualizar Slide');
+                    $('#btnCancel').show();
+                    
+                    $('html, body').animate({
+                        scrollTop: $('#sliderForm').offset().top - 100
+                    }, 500);
+                }
+            });
+        };
+        
+        // Função para cancelar edição
+        window.cancelEdit = function() {
+            resetForm();
+        };
     });
 </script>
 <?php $this->end("js"); ?>

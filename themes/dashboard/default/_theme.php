@@ -1,3 +1,24 @@
+<?php
+// Validação de sessão e autenticação
+use App\Http\Controllers\AuthController;
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Verifica se está autenticado (validação adicional de segurança)
+// Embora o middleware já faça isso, é uma camada extra de proteção no template
+if (!AuthController::isAuthenticated()) {
+    // Se não estiver autenticado, redireciona para login
+    header('Location: ' . urlBase('login'));
+    exit;
+}
+
+// Garante que as variáveis de sessão existam com valores padrão seguros
+$userName = $_SESSION['user_name'] ?? 'Usuário';
+$userRole = $_SESSION['user_role'] ?? 'viewer';
+$userAvatar = $_SESSION['user_avatar'] ?? null;
+?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -42,22 +63,21 @@ else:?>
 
         <div class="sidebar-user">
             <div class="user-avatar">
-                <?php if (!empty($_SESSION['user_avatar'])): ?>
-                    <img src="<?= $_SESSION['user_avatar']; ?>" alt="Avatar" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+                <?php if (!empty($userAvatar)): ?>
+                    <img src="<?= htmlspecialchars($userAvatar); ?>" alt="Avatar" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
                 <?php else: ?>
                     <i class="fas fa-user-circle"></i>
                 <?php endif; ?>
             </div>
             <div class="user-info">
-                <h6 class="user-name"><?= $_SESSION['user_name'] ?? 'Usuário'; ?></h6>
-                <span class="user-role"><?= \App\Helpers\ACL::getRoleLabel($_SESSION['user_role'] ?? 'viewer'); ?></span>
+                <h6 class="user-name"><?= htmlspecialchars($userName); ?></h6>
+                <span class="user-role"><?= \App\Helpers\ACL::getRoleLabel($userRole); ?></span>
             </div>
         </div>
 
         <ul class="sidebar-menu">
             <?php
             // Menu dinâmico baseado no role do usuário
-            $userRole = $_SESSION['user_role'] ?? 'viewer';
             $menuItems = \App\Helpers\ACL::getMenuForRole($userRole);
             
             foreach ($menuItems as $item):
@@ -72,7 +92,7 @@ else:?>
         </ul>
 
         <div class="sidebar-footer">
-            <a href="../index.html" class="menu-link">
+            <a href="<?= urlBase(); ?>" class="menu-link">
                 <i class="fas fa-home"></i>
                 <span>Voltar ao Site</span>
             </a>
@@ -110,7 +130,7 @@ else:?>
                 <div class="dropdown">
                     <button class="btn btn-link dropdown-toggle" type="button" data-bs-toggle="dropdown">
                         <i class="fas fa-user-circle"></i>
-                        <?= $_SESSION['user_name'] ?? 'Usuário'; ?>
+                        <?= htmlspecialchars($userName); ?>
                     </button>
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Perfil</a></li>
@@ -141,6 +161,8 @@ endif; ?>
 <script src="<?= urlBase(THEME_DASHBOARD . "/assets/jquery/jquery-4.0.0.min.js"); ?>"></script>
 <!-- Bootstrap JS -->
 <script src="<?= urlBase(THEME_DASHBOARD . "/assets/bootstrap-5.3.7-dist/js/bootstrap.bundle.min.js"); ?>"></script>
+<!-- Custom JS -->
+<script src="<?= urlBase(THEME_DASHBOARD . "/assets/js/script.js"); ?>"></script>
 <script>
     $(document).ready(function () {
         // Sidebar Toggle
