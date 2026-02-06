@@ -32,16 +32,16 @@
                             <p>Identificação de Colaborador</p>
                         </div>
 
-                        <form id="intranetLoginForm" class="login-form">
+                        <form id="intranetLoginForm" class="login-form" action="<?= urlBase('auth/login'); ?>" method="POST">
                             <div class="form-group">
-                                <label for="matricula">Usuario</label>
-                                <input type="text" class="form-control" id="matricula" required>
+                                <label for="email">E-mail</label>
+                                <input type="email" class="form-control" id="email" name="email" placeholder="seu@email.com" required>
                             </div>
 
                             <div class="form-group">
-                                <label for="intranetPassword">Senha</label>
+                                <label for="password">Senha</label>
                                 <div class="password-input">
-                                    <input type="password" class="form-control" id="intranetPassword" required>
+                                    <input type="password" class="form-control" id="password" name="password" required>
                                     <button type="button" class="password-toggle">
                                         <i class="fas fa-eye"></i>
                                     </button>
@@ -91,4 +91,76 @@
 <?php $this->end("container"); ?>
 
 <?php $this->start("js"); ?>
+<script>
+$(document).ready(function() {
+    // Toggle password visibility
+    $('.password-toggle').on('click', function() {
+        const input = $(this).siblings('input');
+        const icon = $(this).find('i');
+        
+        if (input.attr('type') === 'password') {
+            input.attr('type', 'text');
+            icon.removeClass('fa-eye').addClass('fa-eye-slash');
+        } else {
+            input.attr('type', 'password');
+            icon.removeClass('fa-eye-slash').addClass('fa-eye');
+        }
+    });
+
+    // Login form submission
+    $('#intranetLoginForm').on('submit', function(e) {
+        e.preventDefault();
+        
+        const email = $('#email').val();
+        const password = $('#password').val();
+        const submitBtn = $(this).find('button[type="submit"]');
+        
+        // Desabilita botão
+        submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-2"></i>Entrando...');
+        
+        $.ajax({
+            url: '<?= urlBase("auth/login"); ?>',
+            method: 'POST',
+            data: { email, password },
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    // Mostra mensagem de sucesso
+                    if (typeof showToast === 'function') {
+                        showToast(response.message, 'success');
+                    } else {
+                        alert(response.message);
+                    }
+                    
+                    // Redireciona após 500ms
+                    setTimeout(function() {
+                        window.location.href = response.redirect;
+                    }, 500);
+                } else {
+                    // Mostra erro
+                    if (typeof showToast === 'function') {
+                        showToast(response.message, 'error');
+                    } else {
+                        alert(response.message);
+                    }
+                    
+                    // Reabilita botão
+                    submitBtn.prop('disabled', false).html('<i class="fas fa-sign-in-alt me-2"></i>Entrar');
+                }
+            },
+            error: function() {
+                const msg = 'Erro ao processar login. Tente novamente.';
+                if (typeof showToast === 'function') {
+                    showToast(msg, 'error');
+                } else {
+                    alert(msg);
+                }
+                
+                // Reabilita botão
+                submitBtn.prop('disabled', false).html('<i class="fas fa-sign-in-alt me-2"></i>Entrar');
+            }
+        });
+    });
+});
+</script>
 <?php $this->end("js"); ?>
