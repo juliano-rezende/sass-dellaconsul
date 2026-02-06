@@ -51,48 +51,20 @@ else:?>
         </div>
 
         <ul class="sidebar-menu">
-            <li class="menu-item">
-                <a href="<?= urlBase("dashboard"); ?>" class="menu-link">
-                    <i class="fas fa-tachometer-alt"></i>
-                    <span>Inicio</span>
-                </a>
-            </li>
-            <li class="menu-item">
-                <a href="<?= urlBase("dashboard/formularios"); ?>" class="menu-link">
-                    <i class="fas fa-file-alt"></i>
-                    <span>Formulários</span>
-                </a>
-            </li>
-            <li class="menu-item">
-                <a href="<?= urlBase("dashboard/sliders"); ?>" class="menu-link">
-                    <i class="fas fa-images"></i>
-                    <span>Sliders</span>
-                </a>
-            </li>
-            <li class="menu-item">
-                <a href="<?= urlBase("dashboard/curriculos"); ?>" class="menu-link">
-                    <i class="fas fa-user-tie"></i>
-                    <span>Currículos</span>
-                </a>
-            </li>
-            <li class="menu-item">
-                <a href="<?= urlBase("dashboard/arquivos-condominio"); ?>" class="menu-link">
-                    <i class="fas fa-folder-open"></i>
-                    <span>Arquivos de Condomínio</span>
-                </a>
-            </li>
-            <li class="menu-item">
-                <a href="<?= urlBase("dashboard/usuarios"); ?>" class="menu-link">
-                    <i class="fas fa-users"></i>
-                    <span>Usuários</span>
-                </a>
-            </li>
-            <li class="menu-item">
-                <a href="<?= urlBase("dashboard/configuracoes"); ?>" class="menu-link">
-                    <i class="fas fa-cog"></i>
-                    <span>Configurações</span>
-                </a>
-            </li>
+            <?php
+            // Menu dinâmico baseado no role do usuário
+            $userRole = $_SESSION['user_role'] ?? 'viewer';
+            $menuItems = \App\Helpers\ACL::getMenuForRole($userRole);
+            
+            foreach ($menuItems as $item):
+            ?>
+                <li class="menu-item">
+                    <a href="<?= urlBase($item['url']); ?>" class="menu-link">
+                        <i class="fas <?= $item['icon']; ?>"></i>
+                        <span><?= $item['label']; ?></span>
+                    </a>
+                </li>
+            <?php endforeach; ?>
         </ul>
 
         <div class="sidebar-footer">

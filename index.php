@@ -18,10 +18,8 @@ $router->get("/trabalhe-conosco", "CareersController:index", "careers.index");
 
 $router->group('dashboard')->namespace("App\Http\Controllers\Dashboard");
 $router->get("/", "DashboardController:index", "dashboard.index");
-$router->get("/formularios", "FormController:index", "form.index");
 $router->get("/sliders", "SliderController:index", "slider.index");
 $router->get("/curriculos", "CurriculumController:index", "curriculum.index");
-$router->get("/arquivos-condominio", "ArquivosCondominiumController:index", "curriculum.index");
 $router->get("/usuarios", "UsersController:index", "user.index");
 $router->get("/configuracoes", "ConfigsController:index", "user.index");
 

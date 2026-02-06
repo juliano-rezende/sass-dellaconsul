@@ -131,72 +131,11 @@
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">Permissões</label>
-                    <div class="row">
-                        <div class="col-md-3">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="permDashboard" checked>
-                                <label class="form-check-label" for="permDashboard">
-                                    Dashboard
-                                </label>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="permFormularios">
-                                <label class="form-check-label" for="permFormularios">
-                                    Formulários
-                                </label>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="permSliders">
-                                <label class="form-check-label" for="permSliders">
-                                    Sliders
-                                </label>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="permCurriculos">
-                                <label class="form-check-label" for="permCurriculos">
-                                    Currículos
-                                </label>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="permCondominios" checked>
-                                <label class="form-check-label" for="permCondominios">
-                                    Condomínios
-                                </label>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="permArquivos">
-                                <label class="form-check-label" for="permArquivos">
-                                    Arquivos
-                                </label>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="permUsuarios">
-                                <label class="form-check-label" for="permUsuarios">
-                                    Usuários
-                                </label>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="permConfiguracoes">
-                                <label class="form-check-label" for="permConfiguracoes">
-                                    Configurações
-                                </label>
-                            </div>
-                        </div>
+                    <label class="form-label">Perfil e Permissões</label>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        As permissões são definidas automaticamente pelo <strong>Perfil</strong> selecionado acima.
+                        <a href="#" data-bs-toggle="modal" data-bs-target="#permissionsModal">Ver matriz de permissões</a>
                     </div>
                 </div>
 
@@ -517,4 +456,59 @@
         });
     });
 </script>
+
+<!-- Modal Matriz de Permissões -->
+<div class="modal fade" id="permissionsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-shield-alt me-2"></i>
+                    Matriz de Permissões por Perfil
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Módulo</th>
+                                <th>Administrador</th>
+                                <th>Gerente</th>
+                                <th>Operador</th>
+                                <th>Visualizador</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            $matrix = \App\Helpers\ACL::getPermissionsMatrix();
+                            $modules = ['dashboard', 'sliders', 'curriculos', 'whatsapp', 'usuarios', 'configuracoes'];
+                            
+                            foreach ($modules as $module):
+                            ?>
+                                <tr>
+                                    <td><strong><?= ucfirst($module); ?></strong></td>
+                                    <?php foreach (['admin', 'manager', 'operator', 'viewer'] as $role): ?>
+                                        <td>
+                                            <?php
+                                            $actions = $matrix[$role]['modules'][$module] ?? [];
+                                            if (empty($actions)) {
+                                                echo '<span class="text-muted">-</span>';
+                                            } else {
+                                                echo '<small>' . implode(', ', $actions) . '</small>';
+                                            }
+                                            ?>
+                                        </td>
+                                    <?php endforeach; ?>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <?php $this->end("js"); ?>
