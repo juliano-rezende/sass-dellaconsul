@@ -103,7 +103,7 @@ class ACL
      */
     public static function getRoleLabel(string $role): string
     {
-        return self::ROLES[$role]['label'] ?? 'Desconhecido';
+        return self::ROLES[$role]['label'] ?? $role;
     }
 
     /**
@@ -111,19 +111,14 @@ class ACL
      */
     public static function getAllRoles(): array
     {
-        return array_keys(self::ROLES);
+        return array_map(fn($role) => [
+            'value' => $role,
+            'label' => self::ROLES[$role]['label']
+        ], array_keys(self::ROLES));
     }
 
     /**
-     * Retorna informações completas de todos os roles
-     */
-    public static function getRolesInfo(): array
-    {
-        return self::ROLES;
-    }
-
-    /**
-     * Retorna menu filtrado pelas permissões do role
+     * Retorna menu filtrado por role do usuário
      */
     public static function getMenuForRole(string $role): array
     {
@@ -144,7 +139,6 @@ class ACL
 
     /**
      * Verifica se usuário pode acessar uma rota/recurso
-     * Alias para hasPermission() - mais semântico
      */
     public static function canAccess(string $role, string $permission): bool
     {
@@ -152,37 +146,28 @@ class ACL
     }
 
     /**
-     * Verifica se role existe
+     * Valida se role existe
      */
-    public static function roleExists(string $role): bool
+    public static function isValidRole(string $role): bool
     {
         return isset(self::ROLES[$role]);
     }
 
     /**
-     * Retorna permissões faltantes para um role acessar determinado recurso
+     * Retorna permissões em formato para checkbox (formulário de usuários)
      */
-    public static function getMissingPermissions(string $role, array $requiredPermissions): array
+    public static function getPermissionsForForm(): array
     {
-        $userPermissions = self::getPermissions($role);
-        return array_diff($requiredPermissions, $userPermissions);
-    }
-
-    /**
-     * Verifica se role tem TODAS as permissões especificadas
-     */
-    public static function hasAllPermissions(string $role, array $permissions): bool
-    {
-        $userPermissions = self::getPermissions($role);
-        return empty(array_diff($permissions, $userPermissions));
-    }
-
-    /**
-     * Verifica se role tem ALGUMA das permissões especificadas
-     */
-    public static function hasAnyPermission(string $role, array $permissions): bool
-    {
-        $userPermissions = self::getPermissions($role);
-        return !empty(array_intersect($permissions, $userPermissions));
+        $allPermissions = [];
+        
+        foreach (self::MENU_ITEMS as $item) {
+            $allPermissions[] = [
+                'value' => $item['slug'],
+                'label' => $item['label'],
+                'icon' => $item['icon']
+            ];
+        }
+        
+        return $allPermissions;
     }
 }
