@@ -58,3 +58,4 @@ services:
         limits:
           cpus: '2'
           memory: 2048M
+
