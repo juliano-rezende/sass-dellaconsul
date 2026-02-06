@@ -80,7 +80,7 @@ class AuthMiddleware
     private function redirectToLogin(): void
     {
         $_SESSION['redirect_after_login'] = $_SERVER['REQUEST_URI'] ?? '';
-        header('Location: ' . urlBase('area-segura'));
+        header('Location: ' . urlBase('login'));
         exit;
     }
 

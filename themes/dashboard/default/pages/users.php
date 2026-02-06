@@ -388,8 +388,29 @@
                 return;
             }
 
-            showToast('Usuário salvo com sucesso!', 'success');
-            this.reset();
+            // Envia dados via AJAX
+            const formData = new FormData(this);
+            
+            $.ajax({
+                url: '<?= urlBase("dashboard/usuarios/create"); ?>',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    if (response.success) {
+                        showToast(response.message, 'success');
+                        $('#userForm')[0].reset();
+                        // Recarrega página após 1.5s para mostrar novo usuário
+                        setTimeout(() => location.reload(), 1500);
+                    } else {
+                        showToast(response.message, 'error');
+                    }
+                },
+                error: function() {
+                    showToast('Erro ao criar usuário', 'error');
+                }
+            });
         });
 
         // Search functionality

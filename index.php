@@ -15,7 +15,8 @@ $router->group(null)->namespace("App\Http\Controllers\Site");
 $router->get("/", "HomeController:index", "home.index");
 $router->get("/contatos", "ContactController:index", "contact.index");
 $router->get("/clientes", "MemberAreaController:index", "member.area.index");
-$router->get("/area-segura", "IntranetController:index", "intranet.index");
+$router->get("/login", "IntranetController:index", "login.index");
+$router->get("/area-segura", "IntranetController:index", "login.index"); // Alias para compatibilidade
 $router->get("/trabalhe-conosco", "CareersController:index", "careers.index");
 
 // Rotas de autenticação

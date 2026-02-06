@@ -92,7 +92,7 @@ class AuthController
         session_destroy();
 
         // Redireciona para a página de login
-        header('Location: ' . urlBase('area-segura'));
+        header('Location: ' . urlBase('login'));
         exit;
     }
 
