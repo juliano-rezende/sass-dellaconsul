@@ -30,7 +30,7 @@ class SliderController
 
         try {
             // Busca sliders usando o Model
-            $sliders = Slider::orderBy('order_position', 'ASC')->get();
+            $sliders = Slider::make()->orderBy('order_position', 'ASC')->get();
             
             // Converte para array para manter compatibilidade com a view
             $slidersArray = array_map(fn($slider) => $slider->toArray(), $sliders);
@@ -81,8 +81,8 @@ class SliderController
 
             // Busca último order_position
             if ($orderPosition == 0) {
-                $lastSlider = Slider::orderBy('order_position', 'DESC')->first();
-                $orderPosition = $lastSlider ? ($lastSlider->order_position + 1) : 1;
+                $lastSlider = Slider::make()->orderBy('order_position', 'DESC')->first();
+                $orderPosition = $lastSlider ? ($lastSlider->getAttribute('order_position') + 1) : 1;
             }
 
             // Cria slider usando o Model

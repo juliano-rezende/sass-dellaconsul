@@ -31,10 +31,10 @@ class CurriculumController
 
         try {
             // Busca currículos usando o Model
-            $curriculums = Curriculum::orderBy('created_at', 'DESC')->get();
+            $curriculums = Curriculum::make()->orderBy('created_at', 'DESC')->get();
             
             // Busca áreas de carreira para filtros
-            $careerAreas = CareerArea::orderBy('name', 'ASC')->get();
+            $careerAreas = CareerArea::make()->orderBy('name', 'ASC')->get();
             
             // Converte para array
             $curriculumsArray = array_map(fn($curriculum) => $curriculum->toArray(), $curriculums);

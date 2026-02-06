@@ -30,7 +30,7 @@ class UsersController
 
         try {
             // Busca usuários usando o Model
-            $users = User::orderBy('created_at', 'DESC')->get();
+            $users = User::make()->orderBy('created_at', 'DESC')->get();
             
             // Converte para array para manter compatibilidade com a view
             $usersArray = array_map(fn($user) => $user->toArray(), $users);

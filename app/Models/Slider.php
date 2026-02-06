@@ -62,7 +62,7 @@ class Slider extends BaseModel
      */
     public static function getActiveOrdered(): array
     {
-        return static::active()->ordered()->get();
+        return static::make()->where('status', 'active')->orderBy('order_position', 'ASC')->get();
     }
     
     /**

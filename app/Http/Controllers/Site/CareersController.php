@@ -21,7 +21,7 @@ class CareersController
     {
         // Busca áreas de carreira para o formulário
         try {
-            $careerAreas = CareerArea::orderBy('name', 'ASC')->get();
+            $careerAreas = CareerArea::make()->orderBy('name', 'ASC')->get();
             $careerAreasArray = array_map(fn($area) => $area->toArray(), $careerAreas);
         } catch (\Exception $e) {
             $careerAreasArray = [];
