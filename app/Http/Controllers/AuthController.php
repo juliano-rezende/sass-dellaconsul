@@ -9,21 +9,6 @@ use PDO;
 class AuthController
 {
     /**
-     * Exibe página de login
-     */
-    public function loginPage(): void
-    {
-        // Se já está logado, redireciona para dashboard
-        if (isset($_SESSION['user_id'])) {
-            header('Location: ' . urlBase('dashboard'));
-            exit;
-        }
-
-        // Renderiza página de login
-        require_once dirname(__DIR__, 3) . '/themes/site/default/pages/login.php';
-    }
-
-    /**
      * Processa login
      */
     public function login(): void

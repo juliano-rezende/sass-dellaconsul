@@ -20,7 +20,6 @@ $router->get("/trabalhe-conosco", "CareersController:index", "careers.index");
 
 // Rotas de autenticação
 $router->group(null)->namespace("App\Http\Controllers");
-$router->get("/area-segura", "AuthController:loginPage", "auth.login.page");
 $router->post("/auth/login", "AuthController:login", "auth.login");
 $router->get("/auth/logout", "AuthController:logout", "auth.logout");
 

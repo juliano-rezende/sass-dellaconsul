@@ -32,16 +32,26 @@
                             <p>Identificação de Colaborador</p>
                         </div>
 
+                        <?php if (isset($_SESSION['login_error'])): ?>
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <i class="fas fa-exclamation-circle me-2"></i>
+                                <?= $_SESSION['login_error']; ?>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                            <?php unset($_SESSION['login_error']); ?>
+                        <?php endif; ?>
+
                         <form id="intranetLoginForm" class="login-form">
                             <div class="form-group">
-                                <label for="matricula">Usuario</label>
-                                <input type="text" class="form-control" id="matricula" required>
+                                <label for="email">E-mail</label>
+                                <input type="email" class="form-control" id="email" name="email" 
+                                       placeholder="seu@email.com" required>
                             </div>
 
                             <div class="form-group">
-                                <label for="intranetPassword">Senha</label>
+                                <label for="password">Senha</label>
                                 <div class="password-input">
-                                    <input type="password" class="form-control" id="intranetPassword" required>
+                                    <input type="password" class="form-control" id="password" name="password" required>
                                     <button type="button" class="password-toggle">
                                         <i class="fas fa-eye"></i>
                                     </button>
@@ -49,8 +59,8 @@
                             </div>
 
                             <div class="form-check mb-3">
-                                <input class="form-check-input" type="checkbox" id="intranetRemember">
-                                <label class="form-check-label" for="intranetRemember">
+                                <input class="form-check-input" type="checkbox" id="remember" name="remember">
+                                <label class="form-check-label" for="remember">
                                     Manter conectado
                                 </label>
                             </div>
@@ -58,6 +68,12 @@
                             <button type="submit" class="btn btn-primary w-100">
                                 <i class="fas fa-lock me-2"></i>Acessar Sistema
                             </button>
+                            
+                            <div class="text-center mt-3">
+                                <small class="text-muted">
+                                    Padrão: admin@dellaconsul.com / admin123
+                                </small>
+                            </div>
                         </form>
 
                         <div class="login-footer">
@@ -91,4 +107,51 @@
 <?php $this->end("container"); ?>
 
 <?php $this->start("js"); ?>
+<script>
+    $(document).ready(function() {
+        // Toggle password visibility
+        $('.password-toggle').on('click', function() {
+            const passwordInput = $(this).siblings('input');
+            const icon = $(this).find('i');
+            
+            if (passwordInput.attr('type') === 'password') {
+                passwordInput.attr('type', 'text');
+                icon.removeClass('fa-eye').addClass('fa-eye-slash');
+            } else {
+                passwordInput.attr('type', 'password');
+                icon.removeClass('fa-eye-slash').addClass('fa-eye');
+            }
+        });
+        
+        // Login form submission
+        $('#intranetLoginForm').on('submit', function(e) {
+            e.preventDefault();
+            
+            const btn = $(this).find('button[type="submit"]');
+            const btnText = btn.html();
+            
+            // Desabilita botão
+            btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-2"></i>Entrando...');
+            
+            $.ajax({
+                url: '<?= urlBase("auth/login"); ?>',
+                method: 'POST',
+                data: $(this).serialize(),
+                dataType: 'json',
+                success: function(response) {
+                    if (response.success) {
+                        window.location.href = response.redirect;
+                    } else {
+                        alert(response.message);
+                        btn.prop('disabled', false).html(btnText);
+                    }
+                },
+                error: function() {
+                    alert('Erro ao processar login. Tente novamente.');
+                    btn.prop('disabled', false).html(btnText);
+                }
+            });
+        });
+    });
+</script>
 <?php $this->end("js"); ?>
