@@ -2,9 +2,9 @@
 
 require_once __DIR__ . "/vendor/autoload.php";
 
-// Inicia sessão
-session_start();
+// Configura sessão ANTES de iniciar
 ini_set('session.gc_maxlifetime', 3600);
+session_start();
 
 use CoffeeCode\Router\Router;
 use App\Http\Middlewares\AuthMiddleware;

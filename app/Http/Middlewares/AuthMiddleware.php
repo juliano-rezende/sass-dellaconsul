@@ -27,11 +27,6 @@ class AuthMiddleware
      */
     public function handle(): bool
     {
-        // Inicia sessão se não iniciada
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
-
         // Verifica se está autenticado
         if (!AuthController::check()) {
             $this->redirectToLogin();
