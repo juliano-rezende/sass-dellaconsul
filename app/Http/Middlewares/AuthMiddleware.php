@@ -9,6 +9,8 @@ use CoffeeCode\Router\Router;
 /**
  * Middleware de Autenticação e Validação de ACL
  * Compatível com CoffeeCode Router
+ * 
+ * Nota: SessionMiddleware deve ser executado ANTES deste middleware
  */
 class AuthMiddleware
 {
@@ -20,7 +22,8 @@ class AuthMiddleware
      */
     public function handle(Router $router): bool
     {
-        // Inicia sessão se necessário
+        // SessionMiddleware já inicializou a sessão
+        // Mantém verificação como fallback de segurança
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }

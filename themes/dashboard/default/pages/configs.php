@@ -119,22 +119,22 @@
                                 <div class="row mb-3">
                                     <div class="col-md-6">
                                         <label for="companyName" class="form-label">Nome da Empresa</label>
-                                        <input type="text" class="form-control" id="companyName" value="Della Consul">
+                                        <input type="text" class="form-control" id="companyName" value="<?= $configs['general']['company_name'] ?? 'Della Consul' ?>">
                                     </div>
                                     <div class="col-md-6">
                                         <label for="companyEmail" class="form-label">E-mail da Empresa</label>
-                                        <input type="email" class="form-control" id="companyEmail" value="contato@dellaconsul.com">
+                                        <input type="email" class="form-control" id="companyEmail" value="<?= $configs['general']['company_email'] ?? 'contato@dellaconsul.com' ?>">
                                     </div>
                                 </div>
 
                                 <div class="row mb-3">
                                     <div class="col-md-6">
                                         <label for="companyPhone" class="form-label">Telefone</label>
-                                        <input type="tel" class="form-control" id="companyPhone" value="(11) 9999-9999">
+                                        <input type="tel" class="form-control" id="companyPhone" value="<?= $configs['general']['company_phone'] ?? '(11) 9999-9999' ?>">
                                     </div>
                                     <div class="col-md-6">
                                         <label for="companyAddress" class="form-label">Endereço</label>
-                                        <input type="text" class="form-control" id="companyAddress" value="Rua das Flores, 123 - Centro, São Paulo/SP">
+                                        <input type="text" class="form-control" id="companyAddress" value="<?= $configs['general']['company_address'] ?? '' ?>">
                                     </div>
                                 </div>
 
@@ -199,11 +199,11 @@
                             <div class="system-info">
                                 <div class="info-item">
                                     <span class="label">Versão:</span>
-                                    <span class="value">1.0.0</span>
+                                    <span class="value"><?= $systemStats['version'] ?? '1.0.0' ?></span>
                                 </div>
                                 <div class="info-item">
                                     <span class="label">Última Atualização:</span>
-                                    <span class="value">15/01/2024</span>
+                                    <span class="value"><?= $systemStats['last_update'] ?? date('d/m/Y') ?></span>
                                 </div>
                                 <div class="info-item">
                                     <span class="label">Status:</span>
@@ -211,11 +211,11 @@
                                 </div>
                                 <div class="info-item">
                                     <span class="label">Usuários Ativos:</span>
-                                    <span class="value">10</span>
+                                    <span class="value"><?= $systemStats['active_users'] ?? 0 ?></span>
                                 </div>
                                 <div class="info-item">
-                                    <span class="label">Condomínios:</span>
-                                    <span class="value">24</span>
+                                    <span class="label">Currículos:</span>
+                                    <span class="value"><?= $systemStats['total_curriculum'] ?? 0 ?></span>
                                 </div>
                             </div>
                         </div>

@@ -26,15 +26,14 @@ $userAvatar = $_SESSION['user_avatar'] ?? null;
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Della Consul Intranet</title>
 
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="<?=urlBase(THEME_SITE ."/assets/bootstrap-5.3.7-dist/css/bootstrap.min.css");?>" rel="stylesheet">
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="<?=urlBase(THEME_SITE ."/assets/fontawesome-free-7.0.0-web/css/all.min.css");?>" rel="stylesheet">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
           rel="stylesheet">
     <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="<?= urlBase(THEME_DASHBOARD . "/assets/chart.js/chart.min.js"); ?>"></script>
     <!-- Custom CSS -->
     <link href="<?= urlBase(THEME_DASHBOARD . "/assets/css/style.css"); ?>" rel="stylesheet">
 
@@ -116,17 +115,6 @@ else:?>
                 <h4 class="mb-0">Dashboard</h4>
             </div>
             <div class="d-flex align-items-center">
-                <div class="dropdown me-3">
-                    <button class="btn btn-link dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                        <i class="fas fa-bell"></i>
-                        <span class="badge bg-danger">3</span>
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#">Nova manutenção agendada</a></li>
-                        <li><a class="dropdown-item" href="#">Relatório mensal disponível</a></li>
-                        <li><a class="dropdown-item" href="#">Atualização do sistema</a></li>
-                    </ul>
-                </div>
                 <div class="dropdown">
                     <button class="btn btn-link dropdown-toggle" type="button" data-bs-toggle="dropdown">
                         <i class="fas fa-user-circle"></i>

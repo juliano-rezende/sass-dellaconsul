@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Database\ORM\Traits;
+namespace Database\ORM\Traits;
 
 /**
  * Trait HasRelationships
@@ -149,10 +149,11 @@ trait HasRelationships
     }
 }
 
-/**
- * Helper function to get class basename
- */
-if (!function_exists('class_basename')) {
+// Declare helper function in the same namespace
+if (!function_exists('Database\ORM\Traits\class_basename')) {
+    /**
+     * Helper function to get class basename
+     */
     function class_basename($class): string
     {
         $class = is_object($class) ? get_class($class) : $class;

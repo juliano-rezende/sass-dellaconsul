@@ -30,7 +30,7 @@ else:?>
     <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container">
             <a class="navbar-brand" href="#">
-                <img src="<?=urlBase(THEME_SITE ."/assets/images/logo-cz.jpeg");?>" alt="Della Consul">
+                <img src="<?=urlBase(THEME_SITE ."/assets/images/logo-bg-cz.png");?>" alt="Della Consul">
             </a>
 
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -136,8 +136,8 @@ else:?>
                     <p class="mb-0 text-muted">&copy; 2024 Della Consul. Todos os direitos reservados.</p>
                 </div>
                 <div class="col-md-6 text-md-end">
-                    <a href="politica-privacidade.html" class="text-muted text-decoration-none me-3">Política de Privacidade</a>
-                    <a href="termos-uso.html" class="text-muted text-decoration-none">Termos de Uso</a>
+                    <a href="<?=urlBase('politica-privacidade');?>" class="text-muted text-decoration-none me-3">Política de Privacidade</a>
+                    <a href="<?=urlBase('termos-uso');?>" class="text-muted text-decoration-none">Termos de Uso</a>
                 </div>
             </div>
         </div>

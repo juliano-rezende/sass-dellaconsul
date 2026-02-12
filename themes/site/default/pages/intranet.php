@@ -126,11 +126,7 @@ $(document).ready(function() {
             success: function(response) {
                 if (response.success) {
                     // Mostra mensagem de sucesso
-                    if (typeof showToast === 'function') {
-                        showToast(response.message, 'success');
-                    } else {
-                        alert(response.message);
-                    }
+                    showToast(response.message, 'success');
                     
                     // Redireciona após 500ms
                     setTimeout(function() {
@@ -138,11 +134,7 @@ $(document).ready(function() {
                     }, 500);
                 } else {
                     // Mostra erro
-                    if (typeof showToast === 'function') {
-                        showToast(response.message, 'error');
-                    } else {
-                        alert(response.message);
-                    }
+                    showToast(response.message, 'error');
                     
                     // Reabilita botão
                     submitBtn.prop('disabled', false).html('<i class="fas fa-sign-in-alt me-2"></i>Entrar');
@@ -150,11 +142,7 @@ $(document).ready(function() {
             },
             error: function() {
                 const msg = 'Erro ao processar login. Tente novamente.';
-                if (typeof showToast === 'function') {
-                    showToast(msg, 'error');
-                } else {
-                    alert(msg);
-                }
+                showToast(msg, 'error');
                 
                 // Reabilita botão
                 submitBtn.prop('disabled', false).html('<i class="fas fa-sign-in-alt me-2"></i>Entrar');

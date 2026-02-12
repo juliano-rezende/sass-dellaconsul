@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use App\Database\ORM\Base\BaseModel;
-use App\Database\ORM\Traits\HasTimestamps;
+use Database\ORM\Base\BaseModel;
+use Database\ORM\Traits\HasTimestamps;
 
 /**
  * Slider Model

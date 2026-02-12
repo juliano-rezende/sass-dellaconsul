@@ -69,28 +69,133 @@ $(document).ready(function() {
         }, 2000);
     });
 
-    // Função para mostrar toast notifications
-    function showToast(message, type = 'info') {
+    // Função para mostrar toast notifications (padrão lateral) - Exposta globalmente
+    window.showToast = function(message, type = 'info') {
         const toast = $(`
-            <div class="toast align-items-center text-white bg-${type === 'success' ? 'success' : 'primary'} border-0" role="alert" aria-live="assertive" aria-atomic="true">
-                <div class="d-flex">
-                    <div class="toast-body">
-                        ${message}
-                    </div>
-                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            <div class="toast-notification toast-${type}">
+                <div class="toast-content">
+                    <i class="fas fa-${getToastIcon(type)}"></i>
+                    <span>${message}</span>
                 </div>
+                <button class="toast-close">&times;</button>
             </div>
         `);
         
         $('body').append(toast);
-        const bsToast = new bootstrap.Toast(toast[0]);
-        bsToast.show();
         
-        // Remove toast after it's hidden
-        toast.on('hidden.bs.toast', function() {
-            toast.remove();
+        // Show toast
+        setTimeout(() => {
+            toast.addClass('show');
+        }, 100);
+        
+        // Auto hide
+        setTimeout(() => {
+            hideToast(toast);
+        }, 5000);
+        
+        // Manual close
+        toast.find('.toast-close').on('click', function() {
+            hideToast(toast);
         });
     }
+
+    function hideToast(toast) {
+        toast.removeClass('show');
+        setTimeout(() => {
+            toast.remove();
+        }, 300);
+    }
+
+    function getToastIcon(type) {
+        const icons = {
+            success: 'check-circle',
+            error: 'exclamation-circle',
+            warning: 'exclamation-triangle',
+            info: 'info-circle'
+        };
+        return icons[type] || 'info-circle';
+    }
+
+    // Add toast styles dynamically
+    const toastStyles = `
+        <style>
+            .toast-notification {
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: white;
+                border-radius: 10px;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+                padding: 1rem 1.5rem;
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+                z-index: 9999;
+                transform: translateX(100%);
+                transition: transform 0.3s ease;
+                max-width: 350px;
+            }
+            
+            .toast-notification.show {
+                transform: translateX(0);
+            }
+            
+            .toast-content {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                flex: 1;
+            }
+            
+            .toast-close {
+                background: none;
+                border: none;
+                font-size: 1.25rem;
+                color: #64748b;
+                cursor: pointer;
+                padding: 0;
+                width: 20px;
+                height: 20px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            .toast-success {
+                border-left: 4px solid #10b981;
+            }
+            
+            .toast-error {
+                border-left: 4px solid #ef4444;
+            }
+            
+            .toast-warning {
+                border-left: 4px solid #f59e0b;
+            }
+            
+            .toast-info {
+                border-left: 4px solid #2563eb;
+            }
+            
+            .toast-success i {
+                color: #10b981;
+            }
+            
+            .toast-error i {
+                color: #ef4444;
+            }
+            
+            .toast-warning i {
+                color: #f59e0b;
+            }
+            
+            .toast-info i {
+                color: #2563eb;
+            }
+        </style>
+    `;
+
+    $('head').append(toastStyles);
 
     // Animação de entrada dos elementos
     function animateOnScroll() {

@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use App\Database\ORM\Base\BaseModel;
-use App\Database\ORM\Traits\HasTimestamps;
-use App\Database\ORM\Traits\HasRelationships;
+use Database\ORM\Base\BaseModel;
+use Database\ORM\Traits\HasRelationships;
+use Database\ORM\Traits\HasTimestamps;
 
 /**
  * CareerArea Model

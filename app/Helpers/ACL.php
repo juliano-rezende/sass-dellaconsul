@@ -29,6 +29,7 @@ class ACL
         'usuarios' => ['reset_password' => 'Resetar Senha', 'activate' => 'Ativar', 'deactivate' => 'Desativar'],
         'whatsapp' => ['send' => 'Enviar Mensagem', 'connect' => 'Conectar', 'disconnect' => 'Desconectar'],
         'sliders' => ['reorder' => 'Reordenar', 'toggle_status' => 'Ativar/Desativar'],
+        'depoimentos' => ['approve' => 'Aprovar', 'reject' => 'Rejeitar'],
     ];
 
     /**
@@ -45,6 +46,7 @@ class ACL
                 'usuarios' => ['view', 'create', 'update', 'delete', 'reset_password', 'activate', 'deactivate'],
                 'configuracoes' => ['view', 'update'],
                 'whatsapp' => ['view', 'create', 'update', 'delete', 'send', 'connect', 'disconnect'],
+                'depoimentos' => ['view', 'create', 'update', 'delete', 'approve', 'reject'],
             ]
         ],
         'manager' => [
@@ -55,6 +57,7 @@ class ACL
                 'sliders' => ['view', 'create', 'update', 'reorder'],
                 'curriculos' => ['view', 'update', 'export', 'approve', 'reject', 'schedule'],
                 'whatsapp' => ['view', 'send'],
+                'depoimentos' => ['view', 'approve', 'reject'],
             ]
         ],
         'operator' => [
@@ -64,6 +67,7 @@ class ACL
                 'dashboard' => ['view'],
                 'curriculos' => ['view', 'update', 'schedule'],
                 'whatsapp' => ['view', 'send'],
+                'depoimentos' => ['view'],
             ]
         ],
         'viewer' => [
@@ -99,6 +103,13 @@ class ACL
             'icon' => 'fa-user-tie',
             'url' => 'dashboard/curriculos',
             'module' => 'curriculos'
+        ],
+        [
+            'slug' => 'depoimentos',
+            'label' => 'Depoimentos',
+            'icon' => 'fa-comment-dots',
+            'url' => 'dashboard/depoimentos',
+            'module' => 'depoimentos'
         ],
         [
             'slug' => 'whatsapp',

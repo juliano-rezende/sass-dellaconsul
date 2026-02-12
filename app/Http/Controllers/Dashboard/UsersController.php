@@ -34,10 +34,19 @@ class UsersController
             
             // Converte para array para manter compatibilidade com a view
             $usersArray = array_map(fn($user) => $user->toArray(), $users);
+            
+            // Calcula estatísticas
+            $stats = [
+                'total' => count($usersArray),
+                'active' => count(array_filter($usersArray, fn($u) => ($u['status'] ?? '') === 'active')),
+                'pending' => count(array_filter($usersArray, fn($u) => ($u['status'] ?? '') === 'pending')),
+                'admins' => count(array_filter($usersArray, fn($u) => ($u['role'] ?? '') === 'admin'))
+            ];
 
             echo $this->view->render("pages/users", [
                 "title" => "Usuários",
-                "users" => $usersArray
+                "users" => $usersArray,
+                "stats" => $stats
             ]);
         } catch (\Exception $e) {
             echo "Erro ao carregar usuários: " . $e->getMessage();
@@ -157,6 +166,57 @@ class UsersController
 
         } catch (\Exception $e) {
             echo json_encode(['success' => false, 'message' => 'Erro ao atualizar usuário: ' . $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Busca um usuário específico
+     */
+    public function get(): void
+    {
+        header('Content-Type: application/json');
+
+        // Valida permissão
+        if (!ACL::can($_SESSION['user_role'], 'usuarios', 'view')) {
+            echo json_encode(['success' => false, 'message' => 'Sem permissão para visualizar usuários']);
+            return;
+        }
+
+        try {
+            $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
+
+            if (!$id) {
+                echo json_encode(['success' => false, 'message' => 'ID inválido']);
+                return;
+            }
+
+            // Busca usuário usando o Model
+            $user = User::findById($id);
+
+            if (!$user) {
+                echo json_encode(['success' => false, 'message' => 'Usuário não encontrado']);
+                return;
+            }
+
+            // Converte para array e formata datas
+            $userArray = $user->toArray();
+            if (isset($userArray['created_at']) && $userArray['created_at'] instanceof \DateTime) {
+                $userArray['created_at'] = $userArray['created_at']->format('Y-m-d H:i:s');
+            }
+            if (isset($userArray['updated_at']) && $userArray['updated_at'] instanceof \DateTime) {
+                $userArray['updated_at'] = $userArray['updated_at']->format('Y-m-d H:i:s');
+            }
+            if (isset($userArray['last_login']) && $userArray['last_login'] instanceof \DateTime) {
+                $userArray['last_login'] = $userArray['last_login']->format('Y-m-d H:i:s');
+            }
+
+            // Remove senha do retorno por segurança
+            unset($userArray['password']);
+
+            echo json_encode(['success' => true, 'user' => $userArray]);
+
+        } catch (\Exception $e) {
+            echo json_encode(['success' => false, 'message' => 'Erro ao buscar usuário: ' . $e->getMessage()]);
         }
     }
 

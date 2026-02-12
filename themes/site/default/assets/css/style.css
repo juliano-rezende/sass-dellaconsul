@@ -466,6 +466,332 @@ body {
     transform: scale(1.05);
 }
 
+/* Accordion Horizontal Section */
+.journey-section {
+    padding: 4rem 0;
+}
+
+.accordion-horizontal {
+    display: flex;
+    gap: 1rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    height: 500px;
+    padding: 0 1rem;
+}
+
+/* Panel Base */
+.accordion-panel {
+    flex: 0 0 100px;
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    position: relative;
+    border: 2px solid transparent;
+}
+
+.accordion-panel:hover {
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+
+.accordion-panel.active {
+    flex: 1;
+    cursor: default;
+}
+
+/* Panel Header (visível quando fechado) */
+.panel-header {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    padding: 2rem 1rem;
+    background: linear-gradient(135deg, #f8f9fa, #ffffff);
+    transition: all 0.4s ease;
+}
+
+.accordion-panel.active .panel-header {
+    display: none;
+}
+
+.panel-icon {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: white;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    transition: all 0.4s ease;
+}
+
+.panel-icon.bg-primary {
+    background: linear-gradient(135deg, var(--primary-color), #1d4ed8);
+}
+
+.panel-icon.bg-success {
+    background: linear-gradient(135deg, var(--success-color), #059669);
+}
+
+.panel-icon.bg-info {
+    background: linear-gradient(135deg, #17a2b8, #0891b2);
+}
+
+.accordion-panel:not(.active):hover .panel-icon {
+    transform: scale(1.1) rotate(5deg);
+}
+
+.panel-title {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--dark-color);
+    margin: 0;
+    letter-spacing: 0.05em;
+}
+
+/* Panel Content (visível quando aberto) */
+.panel-content {
+    display: none;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 0.4s ease 0.2s;
+}
+
+.accordion-panel.active .panel-content {
+    display: flex;
+    opacity: 1;
+    animation: fadeIn 0.6s ease forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.panel-image {
+    width: 40%;
+    overflow: hidden;
+    position: relative;
+}
+
+.panel-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+}
+
+.accordion-panel.active:hover .panel-image img {
+    transform: scale(1.05);
+}
+
+.panel-body {
+    flex: 1;
+    padding: 3rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.panel-body::-webkit-scrollbar {
+    width: 8px;
+}
+
+.panel-body::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.panel-body::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 10px;
+}
+
+.panel-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 1rem;
+    width: fit-content;
+}
+
+.panel-heading {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--dark-color);
+    margin-bottom: 1.5rem;
+}
+
+.panel-text {
+    font-size: 1rem;
+    color: var(--gray-600);
+    line-height: 1.8;
+    text-align: justify;
+    margin-bottom: 1rem;
+}
+
+.panel-verse {
+    font-style: italic;
+    color: var(--gray-700);
+}
+
+.panel-verse p {
+    margin-bottom: 1rem;
+    line-height: 1.9;
+}
+
+.panel-list {
+    list-style: none;
+    padding: 0;
+    margin: 1.5rem 0 0 0;
+}
+
+.panel-list li {
+    padding: 0.5rem 0;
+    color: var(--gray-700);
+    display: flex;
+    align-items: flex-start;
+    font-size: 1rem;
+}
+
+.panel-list li i {
+    color: var(--primary-color);
+    margin-top: 0.25rem;
+    flex-shrink: 0;
+}
+
+/* Cores dos painéis ativos */
+.accordion-panel.active[data-panel="historia"] {
+    border-color: var(--primary-color);
+}
+
+.accordion-panel.active[data-panel="objetivos"] {
+    border-color: var(--success-color);
+}
+
+.accordion-panel.active[data-panel="futuro"] {
+    border-color: #17a2b8;
+}
+
+/* Responsividade */
+@media (max-width: 991px) {
+    .accordion-horizontal {
+        flex-direction: column;
+        height: auto;
+        gap: 1rem;
+    }
+    
+    .accordion-panel {
+        flex: 0 0 80px;
+        height: 80px;
+    }
+    
+    .accordion-panel.active {
+        flex: 1;
+        height: 600px;
+    }
+    
+    .panel-header {
+        flex-direction: row;
+        justify-content: flex-start;
+        padding: 1rem 1.5rem;
+    }
+    
+    .panel-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 1.5rem;
+    }
+    
+    .panel-title {
+        writing-mode: horizontal-tb;
+        text-orientation: initial;
+        font-size: 1.25rem;
+    }
+    
+    .panel-content {
+        flex-direction: column;
+    }
+    
+    .panel-image {
+        width: 100%;
+        height: 250px;
+    }
+    
+    .panel-body {
+        padding: 2rem;
+        height: auto;
+    }
+    
+    .panel-heading {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .journey-section {
+        padding: 2rem 0;
+    }
+    
+    .accordion-horizontal {
+        padding: 0 0.5rem;
+    }
+    
+    .accordion-panel {
+        flex: 0 0 70px;
+        height: 70px;
+    }
+    
+    .accordion-panel.active {
+        height: 550px;
+    }
+    
+    .panel-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1.25rem;
+    }
+    
+    .panel-title {
+        font-size: 1rem;
+    }
+    
+    .panel-image {
+        height: 200px;
+    }
+    
+    .panel-body {
+        padding: 1.5rem;
+    }
+    
+    .panel-heading {
+        font-size: 1.25rem;
+    }
+    
+    .panel-text {
+        font-size: 0.9rem;
+    }
+}
+
 /* Estatísticas */
 .stat-item {
     transition: var(--transition);

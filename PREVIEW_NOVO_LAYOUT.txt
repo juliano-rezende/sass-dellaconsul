@@ -1,0 +1,185 @@
+╔═══════════════════════════════════════════════════════════════════════════════╗
+║                    NOVO LAYOUT - TIMELINE SEM LINHA RETA                      ║
+╚═══════════════════════════════════════════════════════════════════════════════╝
+
+                            Nossa Jornada
+                  Da inspiração ao compromisso com o futuro
+
+
+DESKTOP VIEW (> 991px) - SEM LINHA VERTICAL:
+════════════════════════════════════════════════════════════════════════════════
+
+
+      ╔═════════╗
+      ║         ║
+      ║   🚩    ║    ┌──────────────────────────────────────────────────────┐
+      ║         ║    │ ╔═══════════╗  ┌──────────────────────────────────┐  │
+      ╚═════════╝    │ ║           ║  │  🔵 História                     │  │
+                     │ ║  IMAGEM   ║  │  O Início de Tudo                │  │
+                     │ ║           ║  │                                  │  │
+                     │ ║ HISTÓRIA  ║  │  Estabelecer metas ousadas...    │  │
+                     │ ║           ║  │  • Fazer um mutirão              │  │
+                     │ ║    35%    ║  │  • Criar um programa             │  │
+                     │ ╚═══════════╝  │            65%                   │  │
+                     │                └──────────────────────────────────┘  │
+                     └──────────────────────────────────────────────────────┘
+                                    (70% da largura da tela)
+
+
+
+
+      ╔═════════╗
+      ║         ║
+      ║   🎯    ║    ┌──────────────────────────────────────────────────────┐
+      ║         ║    │ ╔═══════════╗  ┌──────────────────────────────────┐  │
+      ╚═════════╝    │ ║           ║  │  🟢 Objetivos                    │  │
+                     │ ║  IMAGEM   ║  │  Nossos Propósitos               │  │
+                     │ ║           ║  │                                  │  │
+                     │ ║ OBJETIVOS ║  │  Nossa visão é limitada          │  │
+                     │ ║           ║  │  mas, podemos ver lá longe...    │  │
+                     │ ║    35%    ║  │  Nossas pernas não lentas...     │  │
+                     │ ╚═══════════╝  │            65%                   │  │
+                     │                └──────────────────────────────────┘  │
+                     └──────────────────────────────────────────────────────┘
+                                    (70% da largura da tela)
+
+
+
+
+      ╔═════════╗
+      ║         ║
+      ║   🚀    ║    ┌──────────────────────────────────────────────────────┐
+      ║         ║    │ ╔═══════════╗  ┌──────────────────────────────────┐  │
+      ╚═════════╝    │ ║           ║  │  🔵 Futuro                       │  │
+                     │ ║  IMAGEM   ║  │  Rumo ao Amanhã                  │  │
+                     │ ║           ║  │                                  │  │
+                     │ ║  FUTURO   ║  │  Vou continuar me esforçando...  │  │
+                     │ ║           ║  │  Darci Rodrigues                 │  │
+                     │ ║    35%    ║  │  Sempre serei fiel...            │  │
+                     │ ╚═══════════╝  │            65%                   │  │
+                     │                └──────────────────────────────────┘  │
+                     └──────────────────────────────────────────────────────┘
+                                    (70% da largura da tela)
+
+
+
+
+MOBILE VIEW (< 576px):
+════════════════════════════════════════════════════════════════════════════════
+
+                        ╔═════════╗
+                        ║         ║
+                        ║   🚩    ║
+                        ║         ║
+                        ╚═════════╝
+
+                ┌────────────────────────────┐
+                │ ╔════════════════════════╗ │
+                │ ║                        ║ │
+                │ ║    IMAGEM HISTÓRIA     ║ │
+                │ ║                        ║ │
+                │ ╚════════════════════════╝ │
+                │                            │
+                │  🔵 História               │
+                │  O Início de Tudo          │
+                │                            │
+                │  Estabelecer metas...      │
+                │  • Fazer um mutirão        │
+                │  • Criar um programa       │
+                └────────────────────────────┘
+
+
+                        ╔═════════╗
+                        ║         ║
+                        ║   🎯    ║
+                        ║         ║
+                        ╚═════════╝
+
+                ┌────────────────────────────┐
+                │ ╔════════════════════════╗ │
+                │ ║                        ║ │
+                │ ║   IMAGEM OBJETIVOS     ║ │
+                │ ║                        ║ │
+                │ ╚════════════════════════╝ │
+                │                            │
+                │  🟢 Objetivos              │
+                │  Nossos Propósitos         │
+                │                            │
+                │  Nossa visão é limitada... │
+                └────────────────────────────┘
+
+
+                        ╔═════════╗
+                        ║         ║
+                        ║   🚀    ║
+                        ║         ║
+                        ╚═════════╝
+
+                ┌────────────────────────────┐
+                │ ╔════════════════════════╗ │
+                │ ║                        ║ │
+                │ ║    IMAGEM FUTURO       ║ │
+                │ ║                        ║ │
+                │ ╚════════════════════════╝ │
+                │                            │
+                │  🔵 Futuro                 │
+                │  Rumo ao Amanhã            │
+                │                            │
+                │  Vou continuar me...       │
+                │  Darci Rodrigues           │
+                └────────────────────────────┘
+
+
+
+
+COMPARAÇÃO: ANTES vs AGORA
+════════════════════════════════════════════════════════════════════════════════
+
+ANTES:                                  AGORA:
+┌─────────────────┐                     ╔═══╗  ┌──────────────────────────┐
+│     CARD 45%    │    ┃                ║ 🚩║  │      CARD 70%            │
+└─────────────────┘    ┃                ╚═══╝  └──────────────────────────┘
+                       ┃
+        ╔═══╗          ┃                ╔═══╗  ┌──────────────────────────┐
+        ║ ⚫ ║          ┃                ║ 🎯║  │      CARD 70%            │
+        ╚═══╝          ┃                ╚═══╝  └──────────────────────────┘
+                       ┃
+┌─────────────────┐    ┃                ╔═══╗  ┌──────────────────────────┐
+│     CARD 45%    │    ┃                ║ 🚀║  │      CARD 70%            │
+└─────────────────┘    ┃                ╚═══╝  └──────────────────────────┘
+                       ┃
+        ╔═══╗          ┃
+        ║ ⚫ ║          ┃
+        ╚═══╝          ┃
+
+❌ Linha reta vertical                  ✅ Sem linha (limpo)
+❌ Cards alternados 45%                 ✅ Cards alinhados 70%
+❌ Visual poluído                       ✅ Visual limpo e moderno
+
+
+
+
+CARACTERÍSTICAS DO NOVO LAYOUT:
+════════════════════════════════════════════════════════════════════════════════
+
+✅ SEM LINHA VERTICAL - Visual limpo e moderno
+✅ CARDS 70% - Melhor aproveitamento do espaço horizontal
+✅ ÍCONES FLUTUANTES - Maiores (70px) com gradiente
+✅ ALINHAMENTO CONSISTENTE - Todos os cards alinhados
+✅ SOMBRAS SUAVES - Profundidade sem exagero
+✅ TOTALMENTE RESPONSIVO - Adapta perfeitamente
+
+ÍCONES:
+  🚩 História  - Azul com gradiente branco→azul claro
+  🎯 Objetivos - Verde com gradiente branco→verde claro
+  🚀 Futuro    - Ciano com gradiente branco→ciano claro
+
+ANIMAÇÕES:
+  • Hover no ícone: Rotação 360° + escala 1.15x
+  • Hover no card: Elevação + zoom na imagem
+  • Transições suaves: 0.3s
+
+
+════════════════════════════════════════════════════════════════════════════════
+                              LAYOUT FINALIZADO
+════════════════════════════════════════════════════════════════════════════════

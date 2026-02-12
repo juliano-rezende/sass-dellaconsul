@@ -28,9 +28,19 @@ class homeController
             $slidersArray = [];
         }
 
+        // Busca depoimentos aprovados do banco
+        try {
+            $testimonials = \App\Models\Testimonial::getApprovedOrdered(10);
+            $testimonialsArray = array_map(fn($testimonial) => $testimonial->toArray(), $testimonials);
+        } catch (\Exception $e) {
+            // Se houver erro, usa array vazio
+            $testimonialsArray = [];
+        }
+
         echo $this->view->render("pages/home", [
             "title" => $router,
-            "sliders" => $slidersArray
+            "sliders" => $slidersArray,
+            "testimonials" => $testimonialsArray
         ]);
     }
 

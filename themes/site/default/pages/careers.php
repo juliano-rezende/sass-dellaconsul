@@ -227,6 +227,34 @@
         height: 80px;
         background: #2c3e50;
     }
+
+    /* Estilização do Date Input */
+    .date-input-wrapper {
+        position: relative;
+    }
+
+    .date-input {
+        padding-right: 45px;
+    }
+
+    .date-input-wrapper::after {
+        content: "\f073";
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        pointer-events: none;
+        color: #667eea;
+        font-size: 1.1rem;
+        z-index: 1;
+        transition: color 0.3s ease;
+    }
+
+    .date-input-wrapper:focus-within::after {
+        color: #764ba2;
+    }
 </style>
 <?php $this->end("css"); ?>
 
@@ -328,8 +356,10 @@
 
                             <div class="col-md-6">
                                 <label for="data_nascimento" class="form-label">Data de Nascimento *</label>
-                                <input type="date" class="form-control" id="data_nascimento" name="data_nascimento"
-                                       required>
+                                <div class="date-input-wrapper">
+                                    <input type="text" class="form-control date-input" id="data_nascimento" name="data_nascimento"
+                                           placeholder="dd/mm/aaaa" maxlength="10" required>
+                                </div>
                             </div>
 
                             <div class="col-md-6">
@@ -639,20 +669,129 @@
             console.error('Elemento #curriculo não encontrado!');
         }
         
-        // Máscara para CPF
-        if ($('#cpf').length > 0 && typeof $.fn.mask !== 'undefined') {
-            $('#cpf').mask('000.000.000-00');
+        // Função para aplicar máscara de CPF
+        function maskCPF(value) {
+            value = value.replace(/\D/g, '');
+            if (value.length <= 11) {
+                value = value.replace(/(\d{3})(\d)/, '$1.$2');
+                value = value.replace(/(\d{3})(\d)/, '$1.$2');
+                value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+            }
+            return value;
         }
 
-        // Máscara para telefone
-        if (typeof $.fn.mask !== 'undefined') {
-            $('#telefone').mask('(00) 0000-0000');
-            $('#celular').mask('(00) 00000-0000');
-            $('#whatsapp').mask('(00) 00000-0000');
-
-            // Máscara para CEP
-            $('#cep').mask('00000-000');
+        // Função para aplicar máscara de CEP
+        function maskCEP(value) {
+            value = value.replace(/\D/g, '');
+            if (value.length <= 8) {
+                value = value.replace(/(\d{5})(\d)/, '$1-$2');
+            }
+            return value;
         }
+
+        // Função para aplicar máscara de telefone
+        function maskPhone(value) {
+            value = value.replace(/\D/g, '');
+            if (value.length <= 10) {
+                value = value.replace(/(\d{2})(\d)/, '($1) $2');
+                value = value.replace(/(\d{4})(\d)/, '$1-$2');
+            } else {
+                value = value.replace(/(\d{2})(\d)/, '($1) $2');
+                value = value.replace(/(\d{5})(\d)/, '$1-$2');
+            }
+            return value;
+        }
+
+        // Aplica máscara de CPF
+        $('#cpf').on('input', function() {
+            const value = $(this).val();
+            $(this).val(maskCPF(value));
+        });
+
+        // Aplica máscara de CEP
+        $('#cep').on('input', function() {
+            const value = $(this).val();
+            $(this).val(maskCEP(value));
+        });
+
+        // Aplica máscara de telefone
+        $('#telefone').on('input', function() {
+            const value = $(this).val();
+            $(this).val(maskPhone(value));
+        });
+
+        // Aplica máscara de celular
+        $('#celular').on('input', function() {
+            const value = $(this).val();
+            $(this).val(maskPhone(value));
+        });
+
+        // Aplica máscara de WhatsApp
+        $('#whatsapp').on('input', function() {
+            const value = $(this).val();
+            $(this).val(maskPhone(value));
+        });
+
+        // Máscara e validação para Data de Nascimento
+        function maskDate(value) {
+            value = value.replace(/\D/g, '');
+            if (value.length <= 8) {
+                value = value.replace(/(\d{2})(\d)/, '$1/$2');
+                value = value.replace(/(\d{2})\/(\d{2})(\d)/, '$1/$2/$3');
+            }
+            return value;
+        }
+
+        function validateDate(value) {
+            const dateRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+            if (!dateRegex.test(value)) return false;
+            
+            const parts = value.split('/');
+            const day = parseInt(parts[0], 10);
+            const month = parseInt(parts[1], 10);
+            const year = parseInt(parts[2], 10);
+            
+            if (month < 1 || month > 12) return false;
+            if (day < 1 || day > 31) return false;
+            
+            const date = new Date(year, month - 1, day);
+            if (date.getDate() !== day || date.getMonth() !== month - 1 || date.getFullYear() !== year) {
+                return false;
+            }
+            
+            // Valida se a data não é futura
+            const today = new Date();
+            if (date > today) return false;
+            
+            // Valida idade mínima (ex: 16 anos) e máxima (ex: 100 anos)
+            const age = today.getFullYear() - year;
+            if (age < 16 || age > 100) return false;
+            
+            return true;
+        }
+
+        $('#data_nascimento').on('input', function() {
+            const value = $(this).val();
+            $(this).val(maskDate(value));
+        });
+
+        $('#data_nascimento').on('blur', function() {
+            const value = $(this).val();
+            if (value && value.length === 10) {
+                if (!validateDate(value)) {
+                    $(this).addClass('is-invalid');
+                    if ($(this).next('.invalid-feedback').length === 0) {
+                        $(this).after('<div class="invalid-feedback">Data inválida. Use o formato dd/mm/aaaa</div>');
+                    }
+                } else {
+                    $(this).removeClass('is-invalid');
+                    $(this).next('.invalid-feedback').remove();
+                    // Converte para formato ISO (YYYY-MM-DD) para envio
+                    const parts = value.split('/');
+                    $(this).data('iso-date', `${parts[2]}-${parts[1]}-${parts[0]}`);
+                }
+            }
+        });
 
         // Busca CEP
         $('#cep').on('blur', function () {
@@ -706,7 +845,7 @@
                 
                 // Validar tamanho (5MB)
                 if (file.size > 5 * 1024 * 1024) {
-                    alert('O arquivo é muito grande. Tamanho máximo: 5MB');
+                    showToast('O arquivo é muito grande. Tamanho máximo: 5MB', 'error');
                     this.value = '';
                     return;
                 }
@@ -717,7 +856,7 @@
                 const fileExtension = file.name.split('.').pop().toLowerCase();
                 
                 if (!allowedTypes.includes(file.type) && !allowedExtensions.includes(fileExtension)) {
-                    alert('Tipo de arquivo não permitido. Use PDF, DOC ou DOCX');
+                    showToast('Tipo de arquivo não permitido. Use PDF, DOC ou DOCX', 'error');
                     this.value = '';
                     return;
                 }
@@ -765,13 +904,13 @@
 
             // Validação básica
             if (!$('#concordo_termos').is(':checked')) {
-                alert('Você deve concordar com os termos para continuar');
+                showToast('Você deve concordar com os termos para continuar', 'warning');
                 return;
             }
 
             const curriculumFile = $('#curriculo')[0].files[0];
             if (!curriculumFile) {
-                alert('Por favor, anexe seu currículo');
+                showToast('Por favor, anexe seu currículo', 'warning');
                 return;
             }
 
@@ -783,7 +922,7 @@
             const cargoInteresse = $('#cargo_interesse').val().trim();
 
             if (!nome || !email || !telefone || !careerAreaId) {
-                alert('Por favor, preencha todos os campos obrigatórios');
+                showToast('Por favor, preencha todos os campos obrigatórios', 'warning');
                 return;
             }
 
@@ -794,9 +933,20 @@
 
             // Prepara FormData
             const formData = new FormData();
+            // Converte data de nascimento de dd/mm/aaaa para aaaa-mm-dd
+            let dataNascimento = $('#data_nascimento').val();
+            if (dataNascimento && dataNascimento.length === 10) {
+                const parts = dataNascimento.split('/');
+                dataNascimento = `${parts[2]}-${parts[1]}-${parts[0]}`;
+            } else {
+                // Tenta usar a data ISO se estiver no data attribute
+                dataNascimento = $('#data_nascimento').data('iso-date') || dataNascimento;
+            }
+
             formData.append('name', nome);
             formData.append('email', email);
             formData.append('phone', telefone);
+            formData.append('birth_date', dataNascimento);
             formData.append('career_area_id', careerAreaId);
             formData.append('position', cargoInteresse || 'Não especificado');
             
@@ -840,19 +990,19 @@
                             result = JSON.parse(response);
                         } catch(e) {
                             console.error('Erro ao parsear resposta:', e, response);
-                            alert('Erro ao processar resposta do servidor');
+                            showToast('Erro ao processar resposta do servidor', 'error');
                             return;
                         }
                     }
                     
                     if (result.success) {
-                        alert(result.message || 'Currículo enviado com sucesso! Nossa equipe entrará em contato em até 48 horas.');
+                        showToast(result.message || 'Currículo enviado com sucesso! Nossa equipe entrará em contato em até 48 horas.', 'success');
                         // Reset do formulário
                         $('#careersForm')[0].reset();
                         $('#fileInfo').hide();
                         $('#fileUploadArea').show();
                     } else {
-                        alert(result.message || 'Erro ao enviar currículo. Tente novamente.');
+                        showToast(result.message || 'Erro ao enviar currículo. Tente novamente.', 'error');
                     }
                 },
                 error: function(xhr, status, error) {
@@ -884,7 +1034,7 @@
                         }
                     }
                     
-                    alert(message);
+                    showToast(message, 'error');
                 }
             });
         });

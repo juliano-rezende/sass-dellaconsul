@@ -216,46 +216,102 @@
     padding: 2rem;
 }
 
-/* Stat Cards */
+/* Stat Cards - Layout Minimalista Clean */
 .stat-card {
     background: white;
-    border-radius: 15px;
-    padding: 1.5rem;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-    border: 1px solid var(--gray-200);
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    border: 1px solid #f0f0f0;
     display: flex;
-    align-items: center;
-    gap: 1rem;
-    transition: var(--transition);
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    min-height: 160px;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--card-color, #2563eb), var(--card-color-light, #60a5fa));
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
 
 .stat-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    border-color: #e5e5e5;
+}
+
+.stat-card:hover::before {
+    opacity: 1;
 }
 
 .stat-icon {
-    width: 60px;
-    height: 60px;
+    width: 48px;
+    height: 48px;
     border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     color: white;
+    flex-shrink: 0;
+}
+
+.stat-info {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
 }
 
 .stat-info h3 {
-    font-size: 2rem;
-    font-weight: 800;
+    font-size: 2.5rem;
+    font-weight: 700;
     margin: 0;
-    color: var(--dark-color);
+    color: #1a1a1a;
+    line-height: 1;
+    letter-spacing: -0.02em;
 }
 
 .stat-info p {
     margin: 0;
-    color: var(--gray-600);
+    color: #6b7280;
     font-weight: 500;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Responsivo para Cards */
+@media (max-width: 768px) {
+    .stat-card {
+        padding: 1.5rem;
+        min-height: 140px;
+    }
+    
+    .stat-icon {
+        width: 42px;
+        height: 42px;
+        font-size: 1.1rem;
+    }
+    
+    .stat-info h3 {
+        font-size: 2rem;
+    }
+    
+    .stat-info p {
+        font-size: 0.813rem;
+    }
 }
 
 /* Chart Cards */
@@ -502,4 +558,286 @@
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+}
+
+/* ============================================
+   ESTILOS GLOBAIS PARA TABELAS DO DASHBOARD
+   ============================================ */
+
+/* Layout e alinhamento da tabela */
+.table {
+    table-layout: fixed;
+    width: 100%;
+    background-color: white;
+}
+
+.table th,
+.table td {
+    vertical-align: middle !important;
+    padding: 0.875rem 0.75rem !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Headers da tabela */
+.table th {
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #495057;
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #dee2e6;
+}
+
+/* Checkboxes visíveis e estilizados */
+.form-check-input {
+    width: 1.25rem !important;
+    height: 1.25rem !important;
+    border: 2px solid #cbd5e0 !important;
+    border-radius: 0.25rem !important;
+    cursor: pointer;
+    margin: 0 auto;
+    display: block;
+    background-color: white;
+}
+
+.form-check-input:hover {
+    border-color: #0d6efd !important;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+}
+
+.form-check-input:checked {
+    background-color: #0d6efd !important;
+    border-color: #0d6efd !important;
+}
+
+.form-check-input:focus {
+    border-color: #0d6efd !important;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+/* Permitir quebra de linha na coluna candidato/nome */
+.table td:nth-child(2) {
+    white-space: normal;
+}
+
+/* Alinhamento de divs com flex */
+.table .d-flex.align-items-center {
+    gap: 0.75rem;
+}
+
+/* Títulos e textos na tabela */
+.table h6 {
+    font-size: 0.95rem;
+    line-height: 1.3;
+    margin-bottom: 0;
+}
+
+.table small {
+    font-size: 0.8rem;
+}
+
+/* Badges alinhados e com largura mínima */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 90px;
+    padding: 0.45rem 0.75rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+/* Hover nas linhas da tabela */
+.table-hover tbody tr:hover {
+    background-color: #f8f9fa;
+    cursor: pointer;
+}
+
+/* Botões dentro da tabela */
+.table .btn-sm {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.85rem;
+}
+
+/* Ícones dentro da tabela */
+.table .fa-user-circle,
+.table .avatar i {
+    flex-shrink: 0;
+}
+
+/* Estilo para células vazias */
+.table tbody tr td.text-center.py-5 {
+    white-space: normal;
+}
+
+/* Responsividade para tabelas */
+@media (max-width: 768px) {
+    .table th,
+    .table td {
+        padding: 0.625rem 0.5rem !important;
+        font-size: 0.85rem;
+    }
+    
+    .table h6 {
+        font-size: 0.875rem;
+    }
+    
+    .table small {
+        font-size: 0.75rem;
+    }
+    
+    .badge {
+        min-width: 70px;
+        padding: 0.35rem 0.5rem;
+        font-size: 0.75rem;
+    }
+    
+    .form-check-input {
+        width: 1.1rem !important;
+        height: 1.1rem !important;
+    }
+}
+
+@media (max-width: 576px) {
+    .table-responsive {
+        font-size: 0.8rem;
+    }
+    
+    .table th,
+    .table td {
+        padding: 0.5rem 0.35rem !important;
+    }
+}
+
+/* ===========================
+   ESTILOS GLOBAIS PARA MODALS
+   =========================== */
+
+/* Modal Content - Estilo moderno inspirado no site */
+.modal-content {
+    border-radius: 15px;
+    border: none;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+/* Modal Header - Azul sólido elegante */
+.modal-header {
+    background: var(--primary-color);
+    color: white;
+    border-radius: 15px 15px 0 0;
+    border-bottom: none;
+    padding: 1.5rem 2rem;
+}
+
+/* Título da Modal */
+.modal-title {
+    font-weight: 600;
+    color: white;
+}
+
+.modal-title i {
+    opacity: 0.95;
+}
+
+/* Botão de fechar - Branco */
+.modal-header .btn-close {
+    filter: brightness(0) invert(1);
+    opacity: 0.9;
+}
+
+.modal-header .btn-close:hover {
+    opacity: 1;
+}
+
+/* Modal Body - Padding generoso */
+.modal-body {
+    padding: 2rem !important;
+}
+
+/* Modal Footer */
+.modal-footer {
+    border-top: 1px solid #e9ecef;
+    padding: 1.25rem 2rem;
+    background-color: #f8f9fa;
+    border-radius: 0 0 15px 15px;
+}
+
+/* Melhorias nos inputs das modals */
+.modal-body .form-label {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+.modal-body .form-control,
+.modal-body .form-select {
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    padding: 0.75rem;
+    transition: all 0.3s ease;
+    background-color: #f8f9fa;
+}
+
+.modal-body .form-control:focus,
+.modal-body .form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.1);
+    background-color: white;
+}
+
+.modal-body textarea.form-control {
+    resize: vertical;
+    min-height: 100px;
+}
+
+/* Botões da modal */
+.modal-footer .btn {
+    border-radius: 8px;
+    padding: 0.65rem 1.5rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.modal-footer .btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+}
+
+.modal-footer .btn-secondary:hover {
+    background-color: #5a6268;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.modal-footer .btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.modal-footer .btn-primary:hover {
+    background-color: #1d4ed8;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+/* Responsividade para modals */
+@media (max-width: 768px) {
+    .modal-dialog {
+        margin: 0.5rem;
+    }
+    
+    .modal-body {
+        padding: 1.5rem !important;
+    }
+    
+    .modal-header {
+        padding: 1.25rem 1.5rem;
+    }
+    
+    .modal-footer {
+        padding: 1rem 1.5rem;
+    }
 } 

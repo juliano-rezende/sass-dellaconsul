@@ -31,26 +31,23 @@ $(document).ready(function() {
     // Logout functionality
     $('#logoutBtn').on('click', function(e) {
         e.preventDefault();
-        if (confirm('Tem certeza que deseja sair?')) {
+        showConfirm('Tem certeza que deseja sair?', function() {
             // Simulate logout
             showToast('Logout realizado com sucesso!', 'success');
             setTimeout(function() {
                 window.location.href = '../intranet.html';
             }, 1500);
-        }
+        });
     });
 
     // Initialize Charts
     initializeCharts();
 
-    // Initialize notifications
-    initializeNotifications();
-
     // Initialize quick actions
     initializeQuickActions();
 
-    // Auto-refresh dashboard data
-    setInterval(refreshDashboardData, 30000); // Refresh every 30 seconds
+    // Auto-refresh dashboard data - DESABILITADO: dados agora vêm do banco de dados
+    // setInterval(refreshDashboardData, 30000); // Refresh every 30 seconds
 });
 
 // Chart Initialization
@@ -129,21 +126,21 @@ function initializeCharts() {
     }
 }
 
-// Notifications
-function initializeNotifications() {
-    // Simulate real-time notifications
-    setInterval(function() {
-        const notifications = [
-            'Nova manutenção agendada para amanhã',
-            'Relatório financeiro disponível',
-            'Atualização do sistema concluída',
-            'Novo morador cadastrado'
-        ];
-        
-        const randomNotification = notifications[Math.floor(Math.random() * notifications.length)];
-        showToast(randomNotification, 'info');
-    }, 60000); // Every minute
-}
+// Notifications - Desabilitadas
+// function initializeNotifications() {
+//     // Simulate real-time notifications
+//     setInterval(function() {
+//         const notifications = [
+//             'Nova manutenção agendada para amanhã',
+//             'Relatório financeiro disponível',
+//             'Atualização do sistema concluída',
+//             'Novo morador cadastrado'
+//         ];
+//         
+//         const randomNotification = notifications[Math.floor(Math.random() * notifications.length)];
+//         showToast(randomNotification, 'info');
+//     }, 60000); // Every minute
+// }
 
 // Quick Actions
 function initializeQuickActions() {
@@ -160,7 +157,9 @@ function initializeQuickActions() {
     });
 }
 
-// Dashboard Data Refresh
+// Dashboard Data Refresh - REMOVIDO: dados agora vêm do banco de dados
+// A função abaixo foi desabilitada pois os dados agora são dinâmicos e vêm do backend
+/*
 function refreshDashboardData() {
     // Simulate data refresh
     const stats = [
@@ -176,6 +175,7 @@ function refreshDashboardData() {
         });
     });
 }
+*/
 
 // Toast Notifications
 function showToast(message, type = 'info') {
@@ -305,6 +305,70 @@ const toastStyles = `
 
 $('head').append(toastStyles);
 
+// Confirm Modal
+function showConfirm(message, onConfirm, onCancel) {
+    // Remove modal existente se houver
+    $('#confirmModal').remove();
+    
+    const modal = $(`
+        <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header border-0">
+                        <h5 class="modal-title" id="confirmModalLabel">
+                            <i class="fas fa-question-circle text-warning me-2"></i>
+                            Confirmação
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        ${message}
+                    </div>
+                    <div class="modal-footer border-0">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="confirmCancelBtn">
+                            <i class="fas fa-times me-2"></i>
+                            Cancelar
+                        </button>
+                        <button type="button" class="btn btn-primary" id="confirmOkBtn">
+                            <i class="fas fa-check me-2"></i>
+                            Confirmar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `);
+    
+    $('body').append(modal);
+    
+    const bsModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+    bsModal.show();
+    
+    // Handler para confirmação
+    $('#confirmOkBtn').on('click', function() {
+        bsModal.hide();
+        if (typeof onConfirm === 'function') {
+            onConfirm();
+        }
+    });
+    
+    // Handler para cancelamento
+    $('#confirmCancelBtn').on('click', function() {
+        if (typeof onCancel === 'function') {
+            onCancel();
+        }
+    });
+    
+    // Remove modal do DOM após fechar
+    $('#confirmModal').on('hidden.bs.modal', function() {
+        $(this).remove();
+    });
+}
+
+// Exporta showConfirm e showToast globalmente
+window.showConfirm = showConfirm;
+window.showToast = showToast;
+
 // Search functionality
 $('.search-input').on('keyup', function() {
     const query = $(this).val().toLowerCase();
@@ -354,14 +418,6 @@ $(document).on('keydown', function(e) {
     }
 });
 
-// Auto-save functionality
-let autoSaveTimer;
-$('input, textarea, select').on('input change', function() {
-    clearTimeout(autoSaveTimer);
-    autoSaveTimer = setTimeout(function() {
-        showToast('Alterações salvas automaticamente', 'success');
-    }, 2000);
-});
 
 // Responsive adjustments
 $(window).on('resize', function() {
@@ -440,11 +496,17 @@ $('input, textarea, select').on('input', function() {
     $(this).removeClass('is-invalid');
 });
 
-// Initialize tooltips
-$('[data-bs-toggle="tooltip"]').tooltip();
+// Initialize tooltips (Bootstrap 5)
+const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl);
+});
 
-// Initialize popovers
-$('[data-bs-toggle="popover"]').popover();
+// Initialize popovers (Bootstrap 5)
+const popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+popoverTriggerList.map(function (popoverTriggerEl) {
+    return new bootstrap.Popover(popoverTriggerEl);
+});
 
 // Dark mode toggle (if implemented)
 $('.dark-mode-toggle').on('click', function() {
